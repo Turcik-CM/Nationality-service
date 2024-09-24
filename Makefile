@@ -1,26 +1,41 @@
-CURRENT_DIR = $(shell pwd)
+CURRENT_DIR := $(shell pwd)
+DATABASE_URL := postgres://postgres:123321@localhost:5432/turk_nation?sslmode=disable
 
-DB_URL := postgres://postgres:123321@localhost:5432/turk_nation?sslmode=disable
+run-router:
+	@go run cmd/router/main.go
 
-proto-gen:
-	./scripts/gen-proto.sh ${CURRENT_DIR}
+run-service:
+	@go run cmd/service/main.go
 
-swag-init:
-	swag init -g api/router.go --output api/handler/docs
+gen-proto:
+	./scripts/gen-proto.sh "$(CURRENT_DIR)"
 
-
-mig-up:
-	migrate -path migrations -database '${DB_URL}' -verbose up
-
-mig-down:
-	migrate -path migrations -database '${DB_URL}' -verbose down
-
-mig-force:
-	migrate -path migrations -database '${DB_URL}' -verbose force 1
+tidy:
+	@go mod tidy
+	@go mod vendor
 
 mig-create:
-	migrate create -ext sql -dir migrations -seq auth_service_table
+	@read -p "Enter migration name: " name; \
+	migrate create -ext sql -dir migrations -seq "$$name"
+
+mig-up:
+	@migrate -database "$(DATABASE_URL)" -path migrations up
+
+mig-down:
+	@migrate -database "$(DATABASE_URL)" -path migrations down
+
+mig-force:
+	@read -p "Enter migration version: " version; \
+	migrate -database "$(DATABASE_URL)" -path migrations force "$$version"
+
+permission:
+	@chmod +x scripts/gen-proto.sh
+
+test:
+	@go test ./storage/postgres
 
 swag-gen:
-	~/go/bin/swag init -g api/router.go -o api/docs
-#   rm -r db/migrations
+	~/go/bin/swag init -g ./api/router.go -o api/docs
+
+run:
+	@go run cmd/main.go
