@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	config "tourism-service/pkg/config"
+	config "nationality-service/pkg/config"
 )
 
 func ConnectPostgres(config config.Config) (*sqlx.DB, error) {

@@ -1,5 +1,4 @@
 .env
-
-vendor
-
+vendor\
+.idea
 Makefile
