@@ -25,13 +25,12 @@ func NewNationalFoodsStorage(db *sqlx.DB) storage.NationalFoodsStorage {
 func (s *NationalFoodsStorage) CreateNationalFood(in *pb.NationalFood) (*pb.NationalFoodResponse, error) {
 	id := uuid.New()
 	createdAt := time.Now()
-	updatedAt := createdAt
 
 	query := `
-		INSERT INTO foods (id, food_name, food_type, nationality, description, ingredients, image_url, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`
+		INSERT INTO foods (id, food_name, food_type, nationality, description, ingredients, image_url, created_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`
 
-	if err := s.db.QueryRow(query, id, in.Name, in.FoodType, in.Nationality, in.Description, in.Ingredients, in.ImageUrl, createdAt, updatedAt).Scan(&id); err != nil {
+	if err := s.db.QueryRow(query, id, in.Name, in.FoodType, in.Nationality, in.Description, in.Ingredients, in.ImageUrl, createdAt).Scan(&id); err != nil {
 		return nil, err
 	}
 
@@ -43,7 +42,6 @@ func (s *NationalFoodsStorage) CreateNationalFood(in *pb.NationalFood) (*pb.Nati
 		ImageUrl:    in.ImageUrl,
 		Rating:      in.Rating,
 		CreatedAt:   createdAt.String(),
-		UpdatedAt:   updatedAt.String(),
 	}, nil
 }
 
@@ -85,7 +83,7 @@ func (s *NationalFoodsStorage) UpdateNationalFood(in *pb.UpdateNationalFood) (*p
 	}
 
 	if len(updateFields) > 0 {
-		query += fmt.Sprintf("%s, updated_at = $%d", strings.Join(updateFields, ", "), argIndex)
+		query += fmt.Sprintf(" %s, updated_at = $%d", strings.Join(updateFields, ", "), argIndex)
 		args = append(args, time.Now())
 		argIndex++
 	} else {
@@ -100,7 +98,7 @@ func (s *NationalFoodsStorage) UpdateNationalFood(in *pb.UpdateNationalFood) (*p
 		&res.Id, &res.Name, &res.FoodType, &res.Nationality, &res.Description, &res.Ingredients, &res.ImageUrl, &res.CreatedAt, &res.UpdatedAt)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to update national food: %v", err)
 	}
 
 	return &res, nil
@@ -118,7 +116,8 @@ func (s *NationalFoodsStorage) GetNationalFoodByID(in *pb.NationalFoodId) (*pb.N
 }
 
 func (s *NationalFoodsStorage) DeleteNationalFood(in *pb.NationalFoodId) (*pb.Message, error) {
-	query := `DELETE FROM foods WHERE id = $1`
+	query := `update foods set deleted_at = date_part('epoch', current_timestamp)::INT
+                  where id = $1 and deleted_at = 0`
 
 	if _, err := s.db.Exec(query, in.Id); err != nil {
 		return nil, err
@@ -128,7 +127,7 @@ func (s *NationalFoodsStorage) DeleteNationalFood(in *pb.NationalFoodId) (*pb.Me
 }
 
 func (s *NationalFoodsStorage) ListNationalFoods(in *pb.NationalFoodList) (*pb.NationalFoodListResponse, error) {
-	query := `SELECT id, food_name, food_type, nationality, description, ingredients, image_url, created_at, updated_at FROM foods WHERE deleted_at IS NULL`
+	query := `SELECT id, food_name, food_type, nationality, description, ingredients, image_url, created_at, updated_at FROM foods WHERE deleted_at = 0`
 	args := []interface{}{}
 	argIndex := 1
 
@@ -167,7 +166,7 @@ func (s *NationalFoodsStorage) ListNationalFoods(in *pb.NationalFoodList) (*pb.N
 
 	return &pb.NationalFoodListResponse{NationalFood: foods}, nil
 }
-func (s *NationalFoodsStorage) AddImageUrl(in *pb.NationalFoodImage) (*pb.Message, error) {
+func (s *NationalFoodsStorage) AddImageUrll(in *pb.NationalFoodImage) (*pb.Message, error) {
 	query := `UPDATE foods SET image_url = $1 WHERE id = $2`
 
 	res, err := s.db.Exec(query, in.ImageUrl, in.Id)

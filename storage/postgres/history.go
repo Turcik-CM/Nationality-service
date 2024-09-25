@@ -22,13 +22,12 @@ func NewHistoryStorage(db *sqlx.DB) *HistoryStorage {
 func (s *HistoryStorage) AddHistorical(in *pb.Historical) (*pb.HistoricalResponse, error) {
 	id := uuid.New()
 	createdAt := time.Now()
-	updatedAt := createdAt
 
 	query := `
-		INSERT INTO history (id, name, description, country, image_url, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`
+		INSERT INTO history (id, name, description, country, image_url, created_at)
+		VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
 
-	if err := s.db.QueryRow(query, id, in.Name, in.Description, in.Country, in.ImageUrl, createdAt, updatedAt).Scan(&id); err != nil {
+	if err := s.db.QueryRow(query, id, in.Name, in.Description, in.Country, in.ImageUrl, createdAt).Scan(&id); err != nil {
 		return nil, err
 	}
 
@@ -40,7 +39,6 @@ func (s *HistoryStorage) AddHistorical(in *pb.Historical) (*pb.HistoricalRespons
 		Description: in.Description,
 		ImageUrl:    in.ImageUrl,
 		CreatedAt:   createdAt.String(),
-		UpdatedAt:   updatedAt.String(),
 	}, nil
 }
 
@@ -50,6 +48,11 @@ func (s *HistoryStorage) UpdateHistoricals(in *pb.UpdateHistorical) (*pb.Histori
 	argIndex := 1
 	updateFields := []string{}
 
+	if in.Country != "" {
+		updateFields = append(updateFields, fmt.Sprintf("country = $%d", argIndex))
+		args = append(args, in.Country)
+		argIndex++
+	}
 	if in.Name != "" {
 		updateFields = append(updateFields, fmt.Sprintf("name = $%d", argIndex))
 		args = append(args, in.Name)
@@ -60,11 +63,6 @@ func (s *HistoryStorage) UpdateHistoricals(in *pb.UpdateHistorical) (*pb.Histori
 		args = append(args, in.Description)
 		argIndex++
 	}
-	if in.Country != "" {
-		updateFields = append(updateFields, fmt.Sprintf("country = $%d", argIndex))
-		args = append(args, in.Country)
-		argIndex++
-	}
 	if in.ImageUrl != "" {
 		updateFields = append(updateFields, fmt.Sprintf("image_url = $%d", argIndex))
 		args = append(args, in.ImageUrl)
@@ -72,12 +70,14 @@ func (s *HistoryStorage) UpdateHistoricals(in *pb.UpdateHistorical) (*pb.Histori
 	}
 
 	if len(updateFields) > 0 {
-		query += fmt.Sprintf("%s, updated_at = $%d", strings.Join(updateFields, ", "), argIndex)
-		args = append(args, time.Now())
-		argIndex++
+		query += fmt.Sprintf(" %s,", strings.Join(updateFields, ", "))
 	} else {
-		return nil, fmt.Errorf("no fields were updated")
+		return nil, fmt.Errorf("no fields were provided for updating")
 	}
+
+	query += fmt.Sprintf(" updated_at = $%d", argIndex)
+	args = append(args, time.Now())
+	argIndex++
 
 	query += fmt.Sprintf(" WHERE id = $%d RETURNING id, name, description, country, image_url, created_at, updated_at", argIndex)
 	args = append(args, in.Id)
@@ -87,7 +87,7 @@ func (s *HistoryStorage) UpdateHistoricals(in *pb.UpdateHistorical) (*pb.Histori
 		&res.Id, &res.Name, &res.Description, &res.Country, &res.ImageUrl, &res.CreatedAt, &res.UpdatedAt)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to update historical record: %v", err)
 	}
 
 	return &res, nil
@@ -105,7 +105,8 @@ func (s *HistoryStorage) GetHistoricalByID(in *pb.HistoricalId) (*pb.HistoricalR
 }
 
 func (s *HistoryStorage) DeleteHistorical(in *pb.HistoricalId) (*pb.Message, error) {
-	query := `DELETE FROM history WHERE id = $1`
+	query := `update history set deleted_at = date_part('epoch', current_timestamp)::INT
+                  where id = $1 and deleted_at = 0`
 
 	if _, err := s.db.Exec(query, in.Id); err != nil {
 		return nil, err
@@ -122,12 +123,6 @@ func (s *HistoryStorage) ListHistorical(in *pb.HistoricalList) (*pb.HistoricalLi
 	if in.Country != "" {
 		query += fmt.Sprintf(" AND country = $%d", argIndex)
 		args = append(args, in.Country)
-		argIndex++
-	}
-
-	if in.City != "" {
-		query += fmt.Sprintf(" AND city = $%d", argIndex)
-		args = append(args, in.City)
 		argIndex++
 	}
 

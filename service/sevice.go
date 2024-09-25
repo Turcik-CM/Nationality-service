@@ -2,18 +2,23 @@ package service
 
 import (
 	"log/slog"
-	pb "tourism-service/genproto/tourism"
-	"tourism-service/storage"
+	pb "nationality-service/genproto/nationality"
+	"nationality-service/storage"
 )
 
 type TourismService struct {
-	history storage.HistoryStorage
-	logger  *slog.Logger
-	pb.UnimplementedTourismServiceServer
+	history  storage.HistoryStorage
+	nat_food storage.NationalFoodsStorage
+	att      storage.AttractionsStorage
+	logger   *slog.Logger
+	pb.UnimplementedNationalityServiceServer
 }
 
-func NewTourismService(st storage.HistoryStorage) *TourismService {
+func NewTourismService(his storage.HistoryStorage, net_food storage.NationalFoodsStorage, att storage.AttractionsStorage, logger *slog.Logger) *TourismService {
 	return &TourismService{
-		history: st,
+		history:  his,
+		nat_food: net_food,
+		att:      att,
+		logger:   logger,
 	}
 }

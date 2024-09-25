@@ -19,17 +19,16 @@ func NewAttractionsStorage(db *sqlx.DB) *AttractionsStorage {
 	return &AttractionsStorage{db: db}
 }
 
-// CreateAttraction inserts a new attraction into the database using Protobuf structures.
-func (s *AttractionsStorage) CreateAttraction(ctx context.Context, in *pb.Attraction) (*pb.AttractionResponse, error) {
+// CreateAttraction i nserts a new attraction into the database using Protobuf structures.
+func (s *AttractionsStorage) CreateAttraction(in *pb.Attraction) (*pb.AttractionResponse, error) {
 	id := uuid.New()
 	createdAt := time.Now()
-	updatedAt := createdAt
 
 	query := `
-		INSERT INTO attractions (id, category, name, description, country, location, image_url, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`
+		INSERT INTO attractions (id, category, name, description, country, location, image_url, created_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`
 
-	err := s.db.QueryRowContext(ctx, query, id, in.Category, in.Name, in.Description, in.Country, in.Location, in.ImageUrl, createdAt, updatedAt).Scan(&id)
+	err := s.db.QueryRowContext(context.Background(), query, id, in.Category, in.Name, in.Description, in.Country, in.Location, in.ImageUrl, createdAt).Scan(&id)
 	if err != nil {
 		return nil, fmt.Errorf("error creating attraction: %v", err)
 	}
@@ -43,19 +42,18 @@ func (s *AttractionsStorage) CreateAttraction(ctx context.Context, in *pb.Attrac
 		Location:    in.Location,
 		ImageUrl:    in.ImageUrl,
 		CreatedAt:   createdAt.String(),
-		UpdatedAt:   updatedAt.String(),
 	}, nil
 }
 
 // GetAttractionByID retrieves an attraction by its ID using Protobuf.
-func (s *AttractionsStorage) GetAttractionByID(ctx context.Context, in *pb.AttractionId) (*pb.AttractionResponse, error) {
+func (s *AttractionsStorage) GetAttractionByID(in *pb.AttractionId) (*pb.AttractionResponse, error) {
 	query := `
 		SELECT id, category, name, description, country, location, image_url, created_at, updated_at
 		FROM attractions
-		WHERE id = $1 AND deleted_at IS NULL`
+		WHERE id = $1 AND deleted_at = 0`
 
 	var attraction pb.AttractionResponse
-	err := s.db.QueryRowContext(ctx, query, in.Id).Scan(
+	err := s.db.QueryRowContext(context.Background(), query, in.Id).Scan(
 		&attraction.Id, &attraction.Category, &attraction.Name, &attraction.Description, &attraction.Country,
 		&attraction.Location, &attraction.ImageUrl, &attraction.CreatedAt, &attraction.UpdatedAt,
 	)
@@ -67,7 +65,7 @@ func (s *AttractionsStorage) GetAttractionByID(ctx context.Context, in *pb.Attra
 }
 
 // UpdateAttraction updates an existing attraction using Protobuf.
-func (s *AttractionsStorage) UpdateAttraction(ctx context.Context, in *pb.UpdateAttraction) (*pb.AttractionResponse, error) {
+func (s *AttractionsStorage) UpdateAttraction(in *pb.UpdateAttraction) (*pb.AttractionResponse, error) {
 	query := `UPDATE attractions SET`
 	args := []interface{}{}
 	argIndex := 1
@@ -108,11 +106,16 @@ func (s *AttractionsStorage) UpdateAttraction(ctx context.Context, in *pb.Update
 		return nil, fmt.Errorf("no fields to update")
 	}
 
-	query += fmt.Sprintf("%s, updated_at = $%d WHERE id = $%d RETURNING id, category, name, description, country, location, image_url, created_at, updated_at", strings.Join(updateFields, ", "), argIndex, argIndex+1)
-	args = append(args, time.Now(), in.Id)
+	updateFields = append(updateFields, fmt.Sprintf("updated_at = $%d", argIndex))
+	args = append(args, time.Now())
+	argIndex++
+
+	query += fmt.Sprintf(" %s WHERE id = $%d RETURNING id, category, name, description, country, location, image_url, created_at, updated_at",
+		strings.Join(updateFields, ", "), argIndex)
+	args = append(args, in.Id)
 
 	var updated pb.AttractionResponse
-	err := s.db.QueryRowContext(ctx, query, args...).Scan(
+	err := s.db.QueryRowContext(context.Background(), query, args...).Scan(
 		&updated.Id, &updated.Category, &updated.Name, &updated.Description, &updated.Country,
 		&updated.Location, &updated.ImageUrl, &updated.CreatedAt, &updated.UpdatedAt,
 	)
@@ -124,10 +127,11 @@ func (s *AttractionsStorage) UpdateAttraction(ctx context.Context, in *pb.Update
 }
 
 // DeleteAttraction soft deletes an attraction by setting the deleted_at field.
-func (s *AttractionsStorage) DeleteAttraction(ctx context.Context, in *pb.AttractionId) (*pb.Message, error) {
-	query := `UPDATE attractions SET deleted_at = $1 WHERE id = $2`
+func (s *AttractionsStorage) DeleteAttraction(in *pb.AttractionId) (*pb.Message, error) {
+	query := `update attractions set deleted_at = date_part('epoch', current_timestamp)::INT
+                  where id = $1 and deleted_at = 0`
 
-	_, err := s.db.ExecContext(ctx, query, time.Now(), in.Id)
+	_, err := s.db.ExecContext(context.Background(), query, in.Id)
 	if err != nil {
 		return nil, fmt.Errorf("error deleting attraction: %v", err)
 	}
@@ -135,19 +139,15 @@ func (s *AttractionsStorage) DeleteAttraction(ctx context.Context, in *pb.Attrac
 	return &pb.Message{Message: "Attraction deleted successfully"}, nil
 }
 
-// ListAttractions retrieves attractions by country with optional filters and pagination using Protobuf.
-func (s *AttractionsStorage) ListAttractions(ctx context.Context, in *pb.AttractionList) (*pb.AttractionListResponse, error) {
-	// Base query for selecting attractions
+func (s *AttractionsStorage) ListAttractions(in *pb.AttractionList) (*pb.AttractionListResponse, error) {
 	query := `
 		SELECT id, category, name, description, country, location, image_url, created_at, updated_at
 		FROM attractions
-		WHERE deleted_at IS NULL`
+		WHERE deleted_at = 0`
 
-	// Arguments slice and filters
 	var args []interface{}
 	argIndex := 1
 
-	// Dynamically build filters based on input
 	if in.Country != "" {
 		query += fmt.Sprintf(" AND country = $%d", argIndex)
 		args = append(args, in.Country)
@@ -169,7 +169,6 @@ func (s *AttractionsStorage) ListAttractions(ctx context.Context, in *pb.Attract
 		argIndex++
 	}
 
-	// Add pagination (LIMIT and OFFSET)
 	if in.Limit > 0 {
 		query += fmt.Sprintf(" LIMIT $%d", argIndex)
 		args = append(args, in.Limit)
@@ -180,36 +179,38 @@ func (s *AttractionsStorage) ListAttractions(ctx context.Context, in *pb.Attract
 		args = append(args, in.Offset)
 	}
 
-	// Execute the query with filters
-	rows, err := s.db.QueryContext(ctx, query, args...)
+	rows, err := s.db.QueryContext(context.Background(), query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("error listing attractions: %v", err)
 	}
 	defer rows.Close()
 
-	// Parse results into protobuf response
 	var attractions []*pb.AttractionResponse
 	for rows.Next() {
 		var attraction pb.AttractionResponse
 		if err := rows.Scan(&attraction.Id, &attraction.Category, &attraction.Name, &attraction.Description, &attraction.Country, &attraction.Location, &attraction.ImageUrl, &attraction.CreatedAt, &attraction.UpdatedAt); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error scanning attraction: %v", err)
 		}
 		attractions = append(attractions, &attraction)
 	}
 
-	// Return the response
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error during row iteration: %v", err)
+	}
+
 	return &pb.AttractionListResponse{Attractions: attractions}, nil
 }
 
 // SearchAttractions searches for attractions by name or description.
-func (s *AttractionsStorage) SearchAttractions(ctx context.Context, in *pb.AttractionSearch) (*pb.AttractionListResponse, error) {
+func (s *AttractionsStorage) SearchAttractions(in *pb.AttractionSearch) (*pb.AttractionListResponse, error) {
 	query := `
 		SELECT id, category, name, description, country, location, image_url, created_at, updated_at
 		FROM attractions
-		WHERE (name ILIKE '%' || $1 || '%' OR description ILIKE '%' || $1 || '%') AND deleted_at IS NULL
+		WHERE (name ILIKE '%' || $1 || '%' OR description ILIKE '%' || $1 || '%') 
+		AND deleted_at = 0
 		LIMIT $2 OFFSET $3`
 
-	rows, err := s.db.QueryContext(ctx, query, in.SearchTerm, in.Limit, in.Offset)
+	rows, err := s.db.QueryContext(context.Background(), query, in.SearchTerm, in.Limit, in.Offset)
 	if err != nil {
 		return nil, fmt.Errorf("error searching attractions: %v", err)
 	}
@@ -219,28 +220,42 @@ func (s *AttractionsStorage) SearchAttractions(ctx context.Context, in *pb.Attra
 	for rows.Next() {
 		var attraction pb.AttractionResponse
 		if err := rows.Scan(&attraction.Id, &attraction.Category, &attraction.Name, &attraction.Description, &attraction.Country, &attraction.Location, &attraction.ImageUrl, &attraction.CreatedAt, &attraction.UpdatedAt); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error scanning attraction: %v", err)
 		}
 		attractions = append(attractions, &attraction)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error during row iteration: %v", err)
 	}
 
 	return &pb.AttractionListResponse{Attractions: attractions}, nil
 }
 
-// AddImageUrl adds a url to the table
-func (s *AttractionsStorage) AddImageUrl(ctx context.Context, in *pb.AttractionImage) (*pb.AttractionResponse, error) {
+func (s *AttractionsStorage) AddImageUrl(in *pb.AttractionImage) (*pb.Message, error) {
 	query := `
-		UPDATE attractions SET image_url = $1 WHERE id = $2 RETURNING id, category, name, description, country, location, image_url, created_at, updated_at
+		UPDATE attractions SET image_url = $1 WHERE id = $2
 	`
-
-	var attraction pb.AttractionResponse
-	err := s.db.QueryRowContext(ctx, query, in.ImageUrl, in.Id).Scan(
-		&attraction.Id, &attraction.Category, &attraction.Name, &attraction.Description, &attraction.Country,
-		&attraction.Location, &attraction.ImageUrl, &attraction.CreatedAt, &attraction.UpdatedAt,
-	)
+	_, err := s.db.Exec(query, in.ImageUrl, in.Id)
 	if err != nil {
 		return nil, fmt.Errorf("error adding image url: %v", err)
 	}
 
-	return &attraction, nil
+	return &pb.Message{
+		Message: "image url added",
+	}, nil
+}
+
+func (s *AttractionsStorage) RemoveHistoricalImage(in *pb.HistoricalImage) (*pb.Message, error) {
+	query := `
+		UPDATE attractions SET image_url = $1 WHERE id = $2
+	`
+	_, err := s.db.Exec(query, "no imag", in.Id)
+	if err != nil {
+		return nil, fmt.Errorf("error adding image url: %v", err)
+	}
+
+	return &pb.Message{
+		Message: "no image url removed",
+	}, nil
 }

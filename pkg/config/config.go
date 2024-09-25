@@ -1,15 +1,13 @@
 package config
 
 import (
-	"github.com/joho/godotenv"
 	"github.com/spf13/cast"
-	"log"
 	"os"
 )
 
 type Config struct {
-	USER_PORT       string
-	TOURISM_SERVICE string
+	USER_PORT           string
+	NATIONALITY_SERVICE string
 
 	DB_PORT     string
 	DB_HOST     string
@@ -19,19 +17,19 @@ type Config struct {
 }
 
 func Load() Config {
-	if err := godotenv.Load(".env"); err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	//if err := godotenv.Load(".env"); err != nil {
+	//	log.Fatal("Error loading .env file")
+	//}
 
 	config := Config{}
 
 	config.USER_PORT = cast.ToString(coalesce("USER_PORT", ":50050"))
-	config.TOURISM_SERVICE = cast.ToString(coalesce("TOURISM_SERVICE", "7080"))
+	config.NATIONALITY_SERVICE = cast.ToString(coalesce("NATIONALITY_SERVICE", ":7080"))
 	config.DB_PORT = cast.ToString(coalesce("DB_PORT", "5432"))
 	config.DB_HOST = cast.ToString(coalesce("DB_HOST", "localhost"))
 	config.DB_USER = cast.ToString(coalesce("DB_USER", "postgres"))
 	config.DB_PASSWORD = cast.ToString(coalesce("DB_PASSWORD", "dodi"))
-	config.DB_NAME = cast.ToString(coalesce("DB_NAME", "tourism"))
+	config.DB_NAME = cast.ToString(coalesce("DB_NAME", "cm"))
 
 	return config
 }
