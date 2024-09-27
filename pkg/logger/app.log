@@ -1,1 +1,32 @@
 {"time":"2024-09-25T16:10:28.440775091+05:00","level":"ERROR","msg":"Failed to listen to tourism"}
+{"time":"2024-09-26T20:13:24.326267439+05:00","level":"ERROR","msg":"Error in CreateAttraction","!BADKEY":"error creating attraction: pq: relation \"attractions\" does not exist"}
+{"time":"2024-09-26T20:15:02.217806219+05:00","level":"ERROR","msg":"Error in CreateAttraction","!BADKEY":"error creating attraction: pq: invalid input value for enum attraction_type: \"Uzbekistan\""}
+{"time":"2024-09-26T20:17:46.929511285+05:00","level":"ERROR","msg":"Error in","err":"pq: insert or update on table \"history\" violates foreign key constraint \"history_country_fkey\""}
+{"time":"2024-09-27T17:23:39.322743809+05:00","level":"ERROR","msg":"Error in","err":"pq: insert or update on table \"history\" violates foreign key constraint \"history_country_fkey\""}
+{"time":"2024-09-27T17:59:33.085655313+05:00","level":"ERROR","msg":"Error in","err":"pq: operator does not exist: character varying = integer"}
+{"time":"2024-09-27T17:59:45.404711245+05:00","level":"ERROR","msg":"Error in","err":"pq: operator does not exist: character varying = integer"}
+{"time":"2024-09-27T18:04:43.620251791+05:00","level":"ERROR","msg":"Error in","err":"pq: got 1 parameters but the statement requires 0"}
+{"time":"2024-09-27T18:04:50.275741508+05:00","level":"ERROR","msg":"Error in","err":"pq: could not determine data type of parameter $1"}
+{"time":"2024-09-27T18:29:10.644007146+05:00","level":"ERROR","msg":"Error in CreateAttraction","!BADKEY":"error creating attraction: pq: invalid input value for enum attraction_type: \"string\""}
+{"time":"2024-09-27T18:29:51.097851329+05:00","level":"ERROR","msg":"Error in CreateAttraction","!BADKEY":"error creating attraction: pq: invalid input value for enum attraction_type: \"string\""}
+{"time":"2024-09-27T18:31:29.683172633+05:00","level":"ERROR","msg":"Error in CreateAttraction","!BADKEY":"error creating attraction: pq: invalid input value for enum attraction_type: \"string\""}
+{"time":"2024-09-27T18:33:07.291455605+05:00","level":"ERROR","msg":"Error in CreateAttraction","!BADKEY":"error creating attraction: pq: invalid input value for enum attraction_type: \"string\""}
+{"time":"2024-09-27T18:36:16.178251327+05:00","level":"ERROR","msg":"Error in CreateAttraction","!BADKEY":"error creating attraction: pq: invalid input value for enum attraction_type: \"string\""}
+{"time":"2024-09-27T18:36:52.150401093+05:00","level":"ERROR","msg":"Error in CreateAttraction","!BADKEY":"error creating attraction: pq: invalid input value for enum attraction_type: \"string\""}
+{"time":"2024-09-27T18:37:31.095290722+05:00","level":"ERROR","msg":"Error in CreateAttraction","!BADKEY":"error creating attraction: pq: invalid input value for enum attraction_type: \"string\""}
+{"time":"2024-09-27T18:37:37.74085297+05:00","level":"ERROR","msg":"Error in CreateAttraction","!BADKEY":"error creating attraction: pq: insert or update on table \"attractions\" violates foreign key constraint \"attractions_country_fkey\""}
+{"time":"2024-09-27T18:38:09.634457737+05:00","level":"ERROR","msg":"Error in GetAttractionByID","!BADKEY":"error getting attraction by ID: sql: Scan error on column index 6, name \"image_url\": converting NULL to string is unsupported"}
+{"time":"2024-09-27T18:39:17.444244014+05:00","level":"ERROR","msg":"Error in GetAttractionByID","!BADKEY":"error getting attraction by ID: sql: Scan error on column index 6, name \"image_url\": converting NULL to string is unsupported"}
+{"time":"2024-09-27T18:39:34.637281964+05:00","level":"ERROR","msg":"Error in GetAttractionByID","!BADKEY":"error getting attraction by ID: sql: Scan error on column index 6, name \"image_url\": converting NULL to string is unsupported"}
+{"time":"2024-09-27T18:39:39.556461002+05:00","level":"ERROR","msg":"Error in GetAttractionByID","!BADKEY":"error getting attraction by ID: sql: Scan error on column index 5, name \"image_url\": converting NULL to string is unsupported"}
+{"time":"2024-09-27T18:39:40.704712887+05:00","level":"ERROR","msg":"Error in GetAttractionByID","!BADKEY":"error getting attraction by ID: sql: Scan error on column index 5, name \"image_url\": converting NULL to string is unsupported"}
+{"time":"2024-09-27T18:39:43.80050656+05:00","level":"ERROR","msg":"Error in GetAttractionByID","!BADKEY":"error getting attraction by ID: sql: Scan error on column index 5, name \"image_url\": converting NULL to string is unsupported"}
+{"time":"2024-09-27T18:40:03.668912743+05:00","level":"ERROR","msg":"Error in GetAttractionByID","!BADKEY":"error getting attraction by ID: sql: Scan error on column index 5, name \"image_url\": converting NULL to string is unsupported"}
+{"time":"2024-09-27T18:41:07.654495682+05:00","level":"ERROR","msg":"Error in GetAttractionByID","!BADKEY":"error getting attraction by ID: sql: expected 7 destination arguments in Scan, not 5"}
+{"time":"2024-09-27T18:41:52.657838416+05:00","level":"ERROR","msg":"Error in ListAttractions","!BADKEY":"error listing attractions: pq: invalid input value for enum attraction_type: \"string\""}
+{"time":"2024-09-27T18:42:38.389542713+05:00","level":"ERROR","msg":"Error in ListAttractions","!BADKEY":"error scanning attraction: sql: Scan error on column index 6, name \"image_url\": converting NULL to string is unsupported"}
+{"time":"2024-09-27T18:42:43.53224004+05:00","level":"ERROR","msg":"Error in ListAttractions","!BADKEY":"error scanning attraction: sql: Scan error on column index 6, name \"image_url\": converting NULL to string is unsupported"}
+{"time":"2024-09-27T18:42:44.611848405+05:00","level":"ERROR","msg":"Error in ListAttractions","!BADKEY":"error scanning attraction: sql: Scan error on column index 6, name \"image_url\": converting NULL to string is unsupported"}
+{"time":"2024-09-27T18:47:52.301871749+05:00","level":"ERROR","msg":"Error in CreateAttraction","!BADKEY":"error creating attraction: pq: INSERT has more target columns than expressions"}
+{"time":"2024-09-27T19:04:07.418592943+05:00","level":"ERROR","msg":"Error in RemoveHistoricalImage","!BADKEY":"error adding image url: pq: invalid input syntax for type uuid: \"\""}
+{"time":"2024-09-27T19:04:16.864029897+05:00","level":"ERROR","msg":"Error in RemoveHistoricalImage","!BADKEY":"error adding image url: pq: invalid input syntax for type uuid: \"\""}
