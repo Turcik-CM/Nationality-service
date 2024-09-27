@@ -119,7 +119,6 @@ func (s *HistoryStorage) ListHistorical(in *pb.HistoricalList) (*pb.HistoricalLi
 	query := `SELECT id, name, description, country, image_url, created_at, updated_at FROM history WHERE 1=1`
 	args := []interface{}{}
 	argIndex := 1
-
 	if in.Country != "" {
 		query += fmt.Sprintf(" AND country = $%d", argIndex)
 		args = append(args, in.Country)
@@ -132,7 +131,7 @@ func (s *HistoryStorage) ListHistorical(in *pb.HistoricalList) (*pb.HistoricalLi
 		argIndex++
 	}
 
-	if in.Offset >= 0 {
+	if in.Offset > 0 {
 		query += fmt.Sprintf(" OFFSET $%d", argIndex)
 		args = append(args, in.Offset)
 		argIndex++
@@ -152,12 +151,11 @@ func (s *HistoryStorage) ListHistorical(in *pb.HistoricalList) (*pb.HistoricalLi
 		}
 		historicals = append(historicals, &historical)
 	}
-
 	return &pb.HistoricalListResponse{Historical: historicals}, nil
 }
 
 func (s *HistoryStorage) SearchHistorical(in *pb.HistoricalSearch) (*pb.HistoricalListResponse, error) {
-	query := `SELECT id, name, description, country, image_url, created_at, updated_at FROM history WHERE name ILIKE '%' || $1 || '%' or description ILIKE '%' || $1 || '%'`
+	query := `SELECT id, name, description, country, image_url, created_at FROM history WHERE name ILIKE '%' || $1 || '%' or description ILIKE '%' || $1 || '%'`
 	args := []interface{}{in.Search}
 
 	rows, err := s.db.Query(query, args...)
