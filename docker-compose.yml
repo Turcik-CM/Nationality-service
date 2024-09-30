@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  turk-national:
+    build: .
+    ports:
+      - 7080:7080
+    networks:
+      - TurkNet
+
+networks:
+  TurkNet:
+    name: TurkNet
+    driver: bridge
