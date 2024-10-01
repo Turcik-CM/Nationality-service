@@ -10,10 +10,10 @@ services:
       - ./migrations:/migrations
     command: [ "-path", "/migrations", "-database", "postgres://postgres:dodi@postgres_post:5432/cm?sslmode=disable", "up" ]
     depends_on:
-      postgres_post:
+      postgres_national:
         condition: service_healthy
 
-  postgres_post:
+  postgres_national:
     image: postgres:16.3
     container_name: postgres_national
     environment:
