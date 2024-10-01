@@ -44,3 +44,6 @@ networks:
   TurkNet:
     name: TurkNet
     driver: bridge
+
+volumes:
+  postgres_data:
