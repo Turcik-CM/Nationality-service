@@ -7,8 +7,8 @@ services:
     networks:
       - TurkNet
     volumes:
-      - ./migrations:/migrations
-    command: [ "-path", "/migrations", "-database", "postgres://postgres:dodi@postgres_post:5432/cm?sslmode=disable", "up" ]
+       - ./migrations:/migrations
+    command: [ "-path", "/migrations", "-database", "postgres://postgres:dodi@postgres_national:5432/cm?sslmode=disable", "up" ]
     depends_on:
       postgres_national:
         condition: service_healthy
