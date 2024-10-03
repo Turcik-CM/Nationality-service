@@ -1,12 +1,12 @@
 CREATE TABLE IF NOT EXISTS attraction_type(
-    id UUID DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR PRIMARY KEY,
     activity int
 );
 
 CREATE TABLE IF NOT EXISTS countries
 (
-    id          UUID DEFAULT gen_random_uuid(),
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     country     VARCHAR PRIMARY KEY,
     city        VARCHAR,
     nationality VARCHAR,
