@@ -182,3 +182,91 @@ func TestRemoveHistoricalImage(t *testing.T) {
 	}
 	fmt.Println(req)
 }
+
+func TestCreateAttractionType(t *testing.T) {
+	db, err := Connect()
+	if err != nil {
+		t.Errorf("Failed to connect to database: %v", err)
+	}
+	defer db.Close()
+	atts := NewAttractionsStorage(db)
+	res := pb.CreateAttractionTypeRequest{
+		Name:     "dodi",
+		Activity: 1222,
+	}
+	req, err := atts.CreateAttractionType(&res)
+	if err != nil {
+		t.Errorf("Failed to create attraction: %v", err)
+	}
+	fmt.Println(req)
+}
+
+func TestGetAttractionTypeByID(t *testing.T) {
+	db, err := Connect()
+	if err != nil {
+		t.Errorf("Failed to connect to database: %v", err)
+	}
+	defer db.Close()
+	atts := NewAttractionsStorage(db)
+	res := pb.GetAttractionTypeRequest{
+		Id: "d3bf65d9-89fa-4378-82cc-7af465130802",
+	}
+	req, err := atts.GetAttractionTypeByID(&res)
+	if err != nil {
+		t.Errorf("Failed to get attraction: %v", err)
+	}
+	fmt.Println(req)
+}
+
+func TestUpdateAttractionType(t *testing.T) {
+	db, err := Connect()
+	if err != nil {
+		t.Errorf("Failed to connect to database: %v", err)
+	}
+	defer db.Close()
+	atts := NewAttractionsStorage(db)
+	res := pb.UpdateAttractionTypeRequest{
+		Name: "1221",
+		Id:   "d3bf65d9-89fa-4378-82cc-7af465130802",
+	}
+	req, err := atts.UpdateAttractionType(&res)
+	if err != nil {
+		t.Errorf("Failed to update attraction: %v", err)
+	}
+	fmt.Println(req)
+}
+
+func TestDeleteAttractionType(t *testing.T) {
+	db, err := Connect()
+	if err != nil {
+		t.Errorf("Failed to connect to database: %v", err)
+	}
+	defer db.Close()
+	atts := NewAttractionsStorage(db)
+	res := pb.DeleteAttractionTypeRequest{
+		Id: "6a40ddac-6435-4591-825c-689bf8dc663e",
+	}
+	req, err := atts.DeleteAttractionType(&res)
+	if err != nil {
+		t.Errorf("Failed to delete attraction: %v", err)
+	}
+	fmt.Println(req)
+}
+
+func TestListAttractionTypes(t *testing.T) {
+	db, err := Connect()
+	if err != nil {
+		t.Errorf("Failed to connect to database: %v", err)
+	}
+	defer db.Close()
+	atts := NewAttractionsStorage(db)
+	res := pb.ListAttractionTypesRequest{
+		Limit: 1,
+		Name:  "1221",
+	}
+	req, err := atts.ListAttractionTypes(&res)
+	if err != nil {
+		t.Errorf("Failed to list attraction types: %v", err)
+	}
+	fmt.Println(req)
+}

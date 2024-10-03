@@ -128,35 +128,42 @@ func (s *CountriesStorage) DeleteCountry(in *pb.DeleteCountryRequest) (*pb.Messa
 func (s *CountriesStorage) ListCountries(in *pb.ListCountriesRequest) (*pb.ListCountriesResponse, error) {
 	query := `
         SELECT id, country, city, nationality, flag
-        FROM countries
+        FROM countries where 1=1
     `
+	args := []interface{}{}
+	argIndex := 1
+
 	if in.Country != "" {
-		query += ` WHERE country ILIKE '%' || $1 || '%'`
+		query += fmt.Sprintf(" AND country = $%d", argIndex)
+		args = append(args, in.Country)
+		argIndex++
 	}
 
 	if in.City != "" {
-		if in.Country != "" {
-			query += ` AND city ILIKE '%' || $2 || '%'`
-		} else {
-			query += ` WHERE city ILIKE '%' || $1 || '%'`
-		}
+		query += fmt.Sprintf(" AND city = $%d", argIndex)
+		args = append(args, in.City)
+		argIndex++
 	}
 
 	if in.Limit > 0 {
-		query += ` LIMIT $3`
+		query += fmt.Sprintf(" LIMIT $%d", argIndex)
+		args = append(args, in.Limit)
+		argIndex++
 	}
 
 	if in.Offset >= 0 {
-		query += ` OFFSET $4`
+		query += fmt.Sprintf(" OFFSET $%d", argIndex)
+		args = append(args, in.Offset)
+		argIndex++
 	}
 
-	rows, err := s.db.QueryContext(context.Background(), query, in.Country, in.City, in.Limit, in.Offset)
+	rows, err := s.db.Query(query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("error listing countries: %v", err)
 	}
 	defer rows.Close()
 
-	countries := make([]*pb.Country, 0)
+	var countries []*pb.Country
 	for rows.Next() {
 		var country pb.Country
 		if err := rows.Scan(&country.Id, &country.Country, &country.City, &country.Nationality, &country.ImageUrl); err != nil {

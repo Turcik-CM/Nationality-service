@@ -332,7 +332,7 @@ func (s *AttractionsStorage) UpdateAttractionType(in *pb.UpdateAttractionTypeReq
 }
 
 func (s *AttractionsStorage) DeleteAttractionType(in *pb.DeleteAttractionTypeRequest) (*pb.Message, error) {
-	query := `DELETE FROM attraction_type WHERE id = $1`
+	query := `DELETE FROM attraction_types WHERE id = $1`
 	_, err := s.db.ExecContext(context.Background(), query, in.Id)
 	if err != nil {
 		return nil, fmt.Errorf("error deleting attraction type: %v", err)
@@ -343,27 +343,37 @@ func (s *AttractionsStorage) DeleteAttractionType(in *pb.DeleteAttractionTypeReq
 func (s *AttractionsStorage) ListAttractionTypes(in *pb.ListAttractionTypesRequest) (*pb.ListAttractionTypesResponse, error) {
 	query := `
         SELECT id, name, activity
-        FROM attraction_types
+        FROM attraction_types where 1=1
     `
+
+	args := []interface{}{}
+	argIndex := 1
+
 	if in.Name != "" {
-		query += ` WHERE name ILIKE '%' || $1 || '%'`
+		query += fmt.Sprintf(" AND name = $%d", argIndex)
+		args = append(args, in.Name)
+		argIndex++
 	}
 
 	if in.Limit > 0 {
-		query += ` LIMIT $2`
+		query += fmt.Sprintf(" LIMIT $%d", argIndex)
+		args = append(args, in.Limit)
+		argIndex++
 	}
 
 	if in.Offset >= 0 {
-		query += ` OFFSET $3`
+		query += fmt.Sprintf(" OFFSET $%d", argIndex)
+		args = append(args, in.Offset)
+		argIndex++
 	}
 
-	rows, err := s.db.QueryContext(context.Background(), query, in.Name, in.Limit, in.Offset)
+	rows, err := s.db.Query(query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("error listing attraction types: %v", err)
 	}
 	defer rows.Close()
 
-	attractionTypes := make([]*pb.AttractionType1, 0)
+	var attractionTypes []*pb.AttractionType1
 	for rows.Next() {
 		var attractionType pb.AttractionType1
 		if err := rows.Scan(&attractionType.Id, &attractionType.Name, &attractionType.Activity); err != nil {
