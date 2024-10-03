@@ -42,3 +42,11 @@ type NationalFoodsStorage interface {
 	AddImageUrll(in *pb.NationalFoodImage) (*pb.Message, error)
 	//SearchNationalFoods(in *pb.NationalFoodSearch) (*pb.NationalFoodListResponse, error)
 }
+
+type CountriesStorage interface {
+	CreateCountry(in *pb.CreateCountryRequest) (*pb.CreateCountryResponse, error)
+	GetCountry(in *pb.GetCountryRequest) (*pb.GetCountryResponse, error)
+	UpdateCountry(in *pb.UpdateCountryRequest) (*pb.UpdateCountryResponse, error)
+	DeleteCountry(in *pb.DeleteCountryRequest) (*pb.Message, error)
+	ListCountries(in *pb.ListCountriesRequest) (*pb.ListCountriesResponse, error)
+}

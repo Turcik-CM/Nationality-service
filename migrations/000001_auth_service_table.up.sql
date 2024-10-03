@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS countries
 (
     id          UUID DEFAULT gen_random_uuid(),
     country     VARCHAR PRIMARY KEY,
+    city        VARCHAR,
     nationality VARCHAR,
     flag        VARCHAR
 );
