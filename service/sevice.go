@@ -11,14 +11,16 @@ type TourismService struct {
 	nat_food storage.NationalFoodsStorage
 	att      storage.AttractionsStorage
 	logger   *slog.Logger
+	country  storage.CountriesStorage
 	pb.UnimplementedNationalityServiceServer
 }
 
-func NewTourismService(his storage.HistoryStorage, net_food storage.NationalFoodsStorage, att storage.AttractionsStorage, logger *slog.Logger) *TourismService {
+func NewTourismService(his storage.HistoryStorage, net_food storage.NationalFoodsStorage, att storage.AttractionsStorage, ctt storage.CountriesStorage, logger *slog.Logger) *TourismService {
 	return &TourismService{
 		history:  his,
 		nat_food: net_food,
 		att:      att,
+		country:  ctt,
 		logger:   logger,
 	}
 }

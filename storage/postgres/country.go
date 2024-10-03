@@ -39,8 +39,8 @@ func (s *CountriesStorage) CreateCountry(in *pb.CreateCountryRequest) (*pb.Creat
 	}, nil
 }
 
-// GetCountryByID retrieves a country by its ID
-func (s *CountriesStorage) GetCountryByID(in *pb.GetCountryRequest) (*pb.GetCountryResponse, error) {
+// GetCountry retrieves a country by its ID
+func (s *CountriesStorage) GetCountry(in *pb.GetCountryRequest) (*pb.GetCountryResponse, error) {
 	query := `
         SELECT id, country, city, nationality, flag
         FROM countries
