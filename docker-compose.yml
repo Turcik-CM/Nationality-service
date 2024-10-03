@@ -8,7 +8,11 @@ services:
       - TurkNet
     volumes:
       - ./migrations:/migrations
-    command: [ "-path", "/migrations", "-database", "postgres://postgres:dodi@postgres_national:5432/cm?sslmode=disable", "up" ]
+    command:
+      [ "-path", "/migrations",
+        "-database", "postgres://postgres:dodi@postgres_national:5432/cm?sslmode=disable",
+        "up"
+      ]
     depends_on:
       postgres_national:
         condition: service_healthy
@@ -32,7 +36,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      # Updated healthcheck to test the actual database 'cm'
+      # Ensure the health check targets the right host/port inside the container
       test: [ "CMD-SHELL", "pg_isready -h localhost -p 5432 -U postgres -d cm" ]
       interval: 30s
       timeout: 10s
@@ -48,7 +52,7 @@ services:
       postgres_national:
         condition: service_healthy
     healthcheck:
-      # Added better curl health check, ensure your service exposes a /health endpoint
+      # Make sure your app exposes a `/health` endpoint or use a basic HTTP check
       test: ["CMD", "curl", "-f", "http://localhost:7080/health"]
       interval: 30s
       timeout: 10s
