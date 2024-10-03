@@ -30,3 +30,4 @@
 {"time":"2024-09-27T18:47:52.301871749+05:00","level":"ERROR","msg":"Error in CreateAttraction","!BADKEY":"error creating attraction: pq: INSERT has more target columns than expressions"}
 {"time":"2024-09-27T19:04:07.418592943+05:00","level":"ERROR","msg":"Error in RemoveHistoricalImage","!BADKEY":"error adding image url: pq: invalid input syntax for type uuid: \"\""}
 {"time":"2024-09-27T19:04:16.864029897+05:00","level":"ERROR","msg":"Error in RemoveHistoricalImage","!BADKEY":"error adding image url: pq: invalid input syntax for type uuid: \"\""}
+{"time":"2024-10-03T18:27:15.292846195+05:00","level":"ERROR","msg":"Error in CreateAttraction","!BADKEY":"error creating attraction type: dial tcp: lookup postgres_national on 127.0.0.53:53: server misbehaving"}

@@ -14,6 +14,11 @@ type AttractionsStorage interface {
 	SearchAttractions(in *pb.AttractionSearch) (*pb.AttractionListResponse, error)
 	AddImageUrl(in *pb.AttractionImage) (*pb.Message, error)
 	RemoveHistoricalImage(in *pb.HistoricalImage) (*pb.Message, error)
+	CreateAttractionType(in *pb.CreateAttractionTypeRequest) (*pb.CreateAttractionTypeResponse, error)
+	GetAttractionTypeByID(in *pb.GetAttractionTypeRequest) (*pb.GetAttractionTypeResponse, error)
+	UpdateAttractionType(in *pb.UpdateAttractionTypeRequest) (*pb.UpdateAttractionTypeResponse, error)
+	DeleteAttractionType(in *pb.DeleteAttractionTypeRequest) (*pb.Message, error)
+	ListAttractionTypes(in *pb.ListAttractionTypesRequest) (*pb.ListAttractionTypesResponse, error)
 }
 
 // HistoryStorage defines the operations related to historical entities.

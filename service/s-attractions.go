@@ -76,8 +76,8 @@ func (s *TourismService) RemoveHistoricalImage(ctx context.Context, in *pb.Histo
 	}
 	return req, nil
 }
-func (s *TourismService) CreateAttractionType(ctx context.Context, in *pb.Attraction) (*pb.AttractionResponse, error) {
-	req, err := s.att.CreateAttraction(in)
+func (s *TourismService) CreateAttractionType(ctx context.Context, in *pb.CreateAttractionTypeRequest) (*pb.CreateAttractionTypeResponse, error) {
+	req, err := s.att.CreateAttractionType(in)
 	if err != nil {
 		s.logger.Error("Error in CreateAttraction", err)
 		return nil, err
@@ -85,8 +85,8 @@ func (s *TourismService) CreateAttractionType(ctx context.Context, in *pb.Attrac
 	return req, nil
 }
 
-func (s *TourismService) UpdateAttractionType(ctx context.Context, in *pb.UpdateAttraction) (*pb.AttractionResponse, error) {
-	req, err := s.att.UpdateAttraction(in)
+func (s *TourismService) UpdateAttractionType(ctx context.Context, in *pb.UpdateAttractionTypeRequest) (*pb.UpdateAttractionTypeResponse, error) {
+	req, err := s.att.UpdateAttractionType(in)
 	if err != nil {
 		s.logger.Error("Error in UpdateAttraction", err)
 		return nil, err
@@ -94,8 +94,8 @@ func (s *TourismService) UpdateAttractionType(ctx context.Context, in *pb.Update
 	return req, nil
 }
 
-func (s *TourismService) GetAttractionTypeByID(ctx context.Context, in *pb.AttractionId) (*pb.AttractionResponse, error) {
-	req, err := s.att.GetAttractionByID(in)
+func (s *TourismService) GetAttractionType(ctx context.Context, in *pb.GetAttractionTypeRequest) (*pb.GetAttractionTypeResponse, error) {
+	req, err := s.att.GetAttractionTypeByID(in)
 	if err != nil {
 		s.logger.Error("Error in GetAttractionByID", err)
 		return nil, err
@@ -103,8 +103,8 @@ func (s *TourismService) GetAttractionTypeByID(ctx context.Context, in *pb.Attra
 	return req, nil
 }
 
-func (s *TourismService) ListAttractionTypes(ctx context.Context, in *pb.AttractionList) (*pb.AttractionListResponse, error) {
-	req, err := s.att.ListAttractions(in)
+func (s *TourismService) ListAttractionTypes(ctx context.Context, in *pb.ListAttractionTypesRequest) (*pb.ListAttractionTypesResponse, error) {
+	req, err := s.att.ListAttractionTypes(in)
 	if err != nil {
 		s.logger.Error("Error in ListAttractions", err)
 		return nil, err
@@ -112,8 +112,8 @@ func (s *TourismService) ListAttractionTypes(ctx context.Context, in *pb.Attract
 	return req, nil
 }
 
-func (s *TourismService) DeleteAttractionType(ctx context.Context, in *pb.AttractionId) (*pb.Message, error) {
-	req, err := s.att.DeleteAttraction(in)
+func (s *TourismService) DeleteAttractionType(ctx context.Context, in *pb.DeleteAttractionTypeRequest) (*pb.Message, error) {
+	req, err := s.att.DeleteAttractionType(in)
 	if err != nil {
 		s.logger.Error("Error in DeleteAttraction", err)
 		return nil, err
