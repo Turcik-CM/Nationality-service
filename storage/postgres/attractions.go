@@ -264,7 +264,7 @@ func (s *AttractionsStorage) RemoveHistoricalImage(in *pb.HistoricalImage) (*pb.
 
 func (s *AttractionsStorage) CreateAttractionType(in *pb.CreateAttractionTypeRequest) (*pb.CreateAttractionTypeResponse, error) {
 	query := `
-        INSERT INTO attraction_type (name, activity)
+        INSERT INTO attraction_types (name, activity)
         VALUES ($1, $2) RETURNING id, name, activity
     `
 	var attractionType pb.AttractionType1
@@ -281,7 +281,7 @@ func (s *AttractionsStorage) CreateAttractionType(in *pb.CreateAttractionTypeReq
 func (s *AttractionsStorage) GetAttractionTypeByID(in *pb.GetAttractionTypeRequest) (*pb.GetAttractionTypeResponse, error) {
 	query := `
         SELECT id, name, activity
-        FROM attraction_type
+        FROM attraction_types
         WHERE id = $1
     `
 	var attractionType pb.AttractionType1
@@ -296,7 +296,7 @@ func (s *AttractionsStorage) GetAttractionTypeByID(in *pb.GetAttractionTypeReque
 }
 
 func (s *AttractionsStorage) UpdateAttractionType(in *pb.UpdateAttractionTypeRequest) (*pb.UpdateAttractionTypeResponse, error) {
-	query := `UPDATE attraction_type SET`
+	query := `UPDATE attraction_types SET`
 	args := []interface{}{}
 	argIndex := 1
 	updateFields := []string{}
@@ -343,7 +343,7 @@ func (s *AttractionsStorage) DeleteAttractionType(in *pb.DeleteAttractionTypeReq
 func (s *AttractionsStorage) ListAttractionTypes(in *pb.ListAttractionTypesRequest) (*pb.ListAttractionTypesResponse, error) {
 	query := `
         SELECT id, name, activity
-        FROM attraction_type
+        FROM attraction_types
     `
 	if in.Name != "" {
 		query += ` WHERE name ILIKE '%' || $1 || '%'`
