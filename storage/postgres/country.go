@@ -16,7 +16,6 @@ func NewCountriesStorage(db *sqlx.DB) *CountriesStorage {
 	return &CountriesStorage{db: db}
 }
 
-// CreateCountry inserts a new country into the database
 func (s *CountriesStorage) CreateCountry(in *pb.CreateCountryRequest) (*pb.CreateCountryResponse, error) {
 	query := `
         INSERT INTO countries (country, city, nationality, flag)
@@ -39,7 +38,6 @@ func (s *CountriesStorage) CreateCountry(in *pb.CreateCountryRequest) (*pb.Creat
 	}, nil
 }
 
-// GetCountry retrieves a country by its ID
 func (s *CountriesStorage) GetCountry(in *pb.GetCountryRequest) (*pb.GetCountryResponse, error) {
 	query := `
         SELECT id, country, city, nationality, flag
@@ -63,7 +61,6 @@ func (s *CountriesStorage) GetCountry(in *pb.GetCountryRequest) (*pb.GetCountryR
 	}, nil
 }
 
-// UpdateCountry updates an existing country
 func (s *CountriesStorage) UpdateCountry(in *pb.UpdateCountryRequest) (*pb.UpdateCountryResponse, error) {
 	query := `UPDATE countries SET`
 	args := []interface{}{}
@@ -116,7 +113,6 @@ func (s *CountriesStorage) UpdateCountry(in *pb.UpdateCountryRequest) (*pb.Updat
 	}, nil
 }
 
-// DeleteCountry deletes a country by its ID
 func (s *CountriesStorage) DeleteCountry(in *pb.DeleteCountryRequest) (*pb.Message, error) {
 	query := `DELETE FROM countries WHERE id = $1`
 	_, err := s.db.ExecContext(context.Background(), query, in.Id)
@@ -127,7 +123,6 @@ func (s *CountriesStorage) DeleteCountry(in *pb.DeleteCountryRequest) (*pb.Messa
 	return &pb.Message{Message: "Country deleted successfully"}, nil
 }
 
-// ListCountries retrieves a list of countries with optional filters
 func (s *CountriesStorage) ListCountries(in *pb.ListCountriesRequest) (*pb.ListCountriesResponse, error) {
 	query := `
         SELECT id, country, city, nationality, flag

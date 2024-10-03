@@ -1,13 +1,15 @@
-CREATE TABLE IF NOT EXISTS attraction_type(
+CREATE TABLE IF NOT EXISTS attraction_types
+(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR PRIMARY KEY,
-    activity int
+    name VARCHAR NOT NULL UNIQUE,
+    activity INT
 );
+
 
 CREATE TABLE IF NOT EXISTS countries
 (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    country     VARCHAR PRIMARY KEY,
+    country     VARCHAR NOT NULL UNIQUE,
     city        VARCHAR,
     nationality VARCHAR,
     flag        VARCHAR
@@ -28,7 +30,7 @@ CREATE TABLE IF NOT EXISTS history
 CREATE TABLE IF NOT EXISTS attractions
 (
     id          UUID      DEFAULT gen_random_uuid(),
-    category    VARCHAR REFERENCES attraction_type(name),
+    category    VARCHAR REFERENCES attraction_types(name),
     name        VARCHAR(255) NOT NULL,
     description TEXT,
     country     VARCHAR REFERENCES countries (country),
