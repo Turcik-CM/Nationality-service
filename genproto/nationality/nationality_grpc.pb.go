@@ -52,6 +52,11 @@ type NationalityServiceClient interface {
 	AddAttractionImage(ctx context.Context, in *AttractionImage, opts ...grpc.CallOption) (*Message, error)
 	RemoveAttractionImage(ctx context.Context, in *AttractionImage, opts ...grpc.CallOption) (*Message, error)
 	SearchAttraction(ctx context.Context, in *AttractionSearch, opts ...grpc.CallOption) (*AttractionListResponse, error)
+	CreateAttractionType(ctx context.Context, in *CreateAttractionTypeRequest, opts ...grpc.CallOption) (*CreateAttractionTypeResponse, error)
+	GetAttractionType(ctx context.Context, in *GetAttractionTypeRequest, opts ...grpc.CallOption) (*GetAttractionTypeResponse, error)
+	UpdateAttractionType(ctx context.Context, in *UpdateAttractionTypeRequest, opts ...grpc.CallOption) (*UpdateAttractionTypeResponse, error)
+	DeleteAttractionType(ctx context.Context, in *DeleteAttractionTypeRequest, opts ...grpc.CallOption) (*Message, error)
+	ListAttractionTypes(ctx context.Context, in *ListAttractionTypesRequest, opts ...grpc.CallOption) (*ListAttractionTypesResponse, error)
 }
 
 type nationalityServiceClient struct {
@@ -305,6 +310,51 @@ func (c *nationalityServiceClient) SearchAttraction(ctx context.Context, in *Att
 	return out, nil
 }
 
+func (c *nationalityServiceClient) CreateAttractionType(ctx context.Context, in *CreateAttractionTypeRequest, opts ...grpc.CallOption) (*CreateAttractionTypeResponse, error) {
+	out := new(CreateAttractionTypeResponse)
+	err := c.cc.Invoke(ctx, "/nationality.NationalityService/CreateAttractionType", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nationalityServiceClient) GetAttractionType(ctx context.Context, in *GetAttractionTypeRequest, opts ...grpc.CallOption) (*GetAttractionTypeResponse, error) {
+	out := new(GetAttractionTypeResponse)
+	err := c.cc.Invoke(ctx, "/nationality.NationalityService/GetAttractionType", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nationalityServiceClient) UpdateAttractionType(ctx context.Context, in *UpdateAttractionTypeRequest, opts ...grpc.CallOption) (*UpdateAttractionTypeResponse, error) {
+	out := new(UpdateAttractionTypeResponse)
+	err := c.cc.Invoke(ctx, "/nationality.NationalityService/UpdateAttractionType", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nationalityServiceClient) DeleteAttractionType(ctx context.Context, in *DeleteAttractionTypeRequest, opts ...grpc.CallOption) (*Message, error) {
+	out := new(Message)
+	err := c.cc.Invoke(ctx, "/nationality.NationalityService/DeleteAttractionType", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nationalityServiceClient) ListAttractionTypes(ctx context.Context, in *ListAttractionTypesRequest, opts ...grpc.CallOption) (*ListAttractionTypesResponse, error) {
+	out := new(ListAttractionTypesResponse)
+	err := c.cc.Invoke(ctx, "/nationality.NationalityService/ListAttractionTypes", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NationalityServiceServer is the server API for NationalityService service.
 // All implementations must embed UnimplementedNationalityServiceServer
 // for forward compatibility
@@ -339,6 +389,11 @@ type NationalityServiceServer interface {
 	AddAttractionImage(context.Context, *AttractionImage) (*Message, error)
 	RemoveAttractionImage(context.Context, *AttractionImage) (*Message, error)
 	SearchAttraction(context.Context, *AttractionSearch) (*AttractionListResponse, error)
+	CreateAttractionType(context.Context, *CreateAttractionTypeRequest) (*CreateAttractionTypeResponse, error)
+	GetAttractionType(context.Context, *GetAttractionTypeRequest) (*GetAttractionTypeResponse, error)
+	UpdateAttractionType(context.Context, *UpdateAttractionTypeRequest) (*UpdateAttractionTypeResponse, error)
+	DeleteAttractionType(context.Context, *DeleteAttractionTypeRequest) (*Message, error)
+	ListAttractionTypes(context.Context, *ListAttractionTypesRequest) (*ListAttractionTypesResponse, error)
 	mustEmbedUnimplementedNationalityServiceServer()
 }
 
@@ -426,6 +481,21 @@ func (UnimplementedNationalityServiceServer) RemoveAttractionImage(context.Conte
 }
 func (UnimplementedNationalityServiceServer) SearchAttraction(context.Context, *AttractionSearch) (*AttractionListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchAttraction not implemented")
+}
+func (UnimplementedNationalityServiceServer) CreateAttractionType(context.Context, *CreateAttractionTypeRequest) (*CreateAttractionTypeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAttractionType not implemented")
+}
+func (UnimplementedNationalityServiceServer) GetAttractionType(context.Context, *GetAttractionTypeRequest) (*GetAttractionTypeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAttractionType not implemented")
+}
+func (UnimplementedNationalityServiceServer) UpdateAttractionType(context.Context, *UpdateAttractionTypeRequest) (*UpdateAttractionTypeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateAttractionType not implemented")
+}
+func (UnimplementedNationalityServiceServer) DeleteAttractionType(context.Context, *DeleteAttractionTypeRequest) (*Message, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAttractionType not implemented")
+}
+func (UnimplementedNationalityServiceServer) ListAttractionTypes(context.Context, *ListAttractionTypesRequest) (*ListAttractionTypesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAttractionTypes not implemented")
 }
 func (UnimplementedNationalityServiceServer) mustEmbedUnimplementedNationalityServiceServer() {}
 
@@ -926,6 +996,96 @@ func _NationalityService_SearchAttraction_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NationalityService_CreateAttractionType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAttractionTypeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NationalityServiceServer).CreateAttractionType(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/nationality.NationalityService/CreateAttractionType",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NationalityServiceServer).CreateAttractionType(ctx, req.(*CreateAttractionTypeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NationalityService_GetAttractionType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAttractionTypeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NationalityServiceServer).GetAttractionType(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/nationality.NationalityService/GetAttractionType",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NationalityServiceServer).GetAttractionType(ctx, req.(*GetAttractionTypeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NationalityService_UpdateAttractionType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateAttractionTypeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NationalityServiceServer).UpdateAttractionType(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/nationality.NationalityService/UpdateAttractionType",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NationalityServiceServer).UpdateAttractionType(ctx, req.(*UpdateAttractionTypeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NationalityService_DeleteAttractionType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAttractionTypeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NationalityServiceServer).DeleteAttractionType(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/nationality.NationalityService/DeleteAttractionType",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NationalityServiceServer).DeleteAttractionType(ctx, req.(*DeleteAttractionTypeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NationalityService_ListAttractionTypes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAttractionTypesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NationalityServiceServer).ListAttractionTypes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/nationality.NationalityService/ListAttractionTypes",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NationalityServiceServer).ListAttractionTypes(ctx, req.(*ListAttractionTypesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NationalityService_ServiceDesc is the grpc.ServiceDesc for NationalityService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1040,6 +1200,26 @@ var NationalityService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SearchAttraction",
 			Handler:    _NationalityService_SearchAttraction_Handler,
+		},
+		{
+			MethodName: "CreateAttractionType",
+			Handler:    _NationalityService_CreateAttractionType_Handler,
+		},
+		{
+			MethodName: "GetAttractionType",
+			Handler:    _NationalityService_GetAttractionType_Handler,
+		},
+		{
+			MethodName: "UpdateAttractionType",
+			Handler:    _NationalityService_UpdateAttractionType_Handler,
+		},
+		{
+			MethodName: "DeleteAttractionType",
+			Handler:    _NationalityService_DeleteAttractionType_Handler,
+		},
+		{
+			MethodName: "ListAttractionTypes",
+			Handler:    _NationalityService_ListAttractionTypes_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

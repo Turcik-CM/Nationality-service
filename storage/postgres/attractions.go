@@ -53,7 +53,7 @@ func (s *AttractionsStorage) GetAttractionByID(in *pb.AttractionId) (*pb.Attract
 		&attraction.Id, &attraction.Category, &attraction.Description, &attraction.Country,
 		&attraction.Location,
 	)
-	fmt.Println(attraction)
+	fmt.Println(&attraction)
 	if err != nil {
 		return nil, fmt.Errorf("error getting attraction by ID: %v", err)
 	}
@@ -255,4 +255,121 @@ func (s *AttractionsStorage) RemoveHistoricalImage(in *pb.HistoricalImage) (*pb.
 	return &pb.Message{
 		Message: "no image url removed",
 	}, nil
+}
+
+func (s *AttractionsStorage) CreateAttractionType(in *pb.CreateAttractionTypeRequest) (*pb.CreateAttractionTypeResponse, error) {
+	query := `
+        INSERT INTO attraction_type (name, activity)
+        VALUES ($1, $2) RETURNING id, name, activity
+    `
+	var attractionType pb.AttractionType1
+	err := s.db.QueryRowContext(context.Background(), query, in.Name, in.Activity).Scan(
+		&attractionType.Id, &attractionType.Name, &attractionType.Activity,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error creating attraction type: %v", err)
+	}
+
+	return &pb.CreateAttractionTypeResponse{AttractionType: &attractionType}, nil
+}
+
+func (s *AttractionsStorage) GetAttractionTypeByID(in *pb.GetAttractionTypeRequest) (*pb.GetAttractionTypeResponse, error) {
+	query := `
+        SELECT id, name, activity
+        FROM attraction_type
+        WHERE id = $1
+    `
+	var attractionType pb.AttractionType1
+	err := s.db.QueryRowContext(context.Background(), query, in.Id).Scan(
+		&in.Id, &attractionType.Name, &attractionType.Activity,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error getting attraction type by ID: %v", err)
+	}
+
+	return &pb.GetAttractionTypeResponse{AttractionType: &attractionType}, nil
+}
+
+func (s *AttractionsStorage) UpdateAttractionType(in *pb.UpdateAttractionTypeRequest) (*pb.UpdateAttractionTypeResponse, error) {
+	query := `UPDATE attraction_type SET`
+	args := []interface{}{}
+	argIndex := 1
+	updateFields := []string{}
+
+	if in.Name != "" {
+		updateFields = append(updateFields, fmt.Sprintf("name = $%d", argIndex))
+		args = append(args, in.Name)
+		argIndex++
+	}
+	if in.Activity != 0 {
+		updateFields = append(updateFields, fmt.Sprintf("activity = $%d", argIndex))
+		args = append(args, in.Activity)
+		argIndex++
+	}
+
+	if len(updateFields) == 0 {
+		return nil, fmt.Errorf("no fields to update")
+	}
+
+	query += fmt.Sprintf(" %s WHERE id = $%d RETURNING id, name, activity",
+		strings.Join(updateFields, ", "), argIndex)
+	args = append(args, in.Id)
+
+	var updated pb.AttractionType1
+	err := s.db.QueryRowContext(context.Background(), query, args...).Scan(
+		&updated.Id, &updated.Name, &updated.Activity,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error updating attraction type: %v", err)
+	}
+
+	return &pb.UpdateAttractionTypeResponse{AttractionType: &updated}, nil
+}
+
+func (s *AttractionsStorage) DeleteAttractionType(in *pb.DeleteAttractionTypeRequest) (*pb.Message, error) {
+	query := `DELETE FROM attraction_type WHERE id = $1`
+	_, err := s.db.ExecContext(context.Background(), query, in.Id)
+	if err != nil {
+		return nil, fmt.Errorf("error deleting attraction type: %v", err)
+	}
+
+	return &pb.Message{Message: "Attraction type deleted successfully"}, nil
+}
+func (s *AttractionsStorage) ListAttractionTypes(in *pb.ListAttractionTypesRequest) (*pb.ListAttractionTypesResponse, error) {
+	query := `
+        SELECT id, name, activity
+        FROM attraction_type
+    `
+	if in.Name != "" {
+		query += ` WHERE name ILIKE '%' || $1 || '%'`
+	}
+
+	if in.Limit > 0 {
+		query += ` LIMIT $2`
+	}
+
+	if in.Offset >= 0 {
+		query += ` OFFSET $3`
+	}
+
+	rows, err := s.db.QueryContext(context.Background(), query, in.Name, in.Limit, in.Offset)
+	if err != nil {
+		return nil, fmt.Errorf("error listing attraction types: %v", err)
+	}
+	defer rows.Close()
+
+	attractionTypes := make([]*pb.AttractionType1, 0)
+	for rows.Next() {
+		var attractionType pb.AttractionType1
+		if err := rows.Scan(&attractionType.Id, &attractionType.Name, &attractionType.Activity); err != nil {
+			return nil, fmt.Errorf("error scanning attraction type: %v", err)
+		}
+		attractionTypes = append(attractionTypes, &attractionType)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error during row iteration: %v", err)
+	}
+
+	return &pb.ListAttractionTypesResponse{AttractionTypes: attractionTypes}, nil
 }
