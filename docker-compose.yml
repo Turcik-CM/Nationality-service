@@ -54,3 +54,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+
+networks:
+  TurkNet:
+    name: TurkNet
+    driver: bridge
+
+volumes:
+  postgres_data:
