@@ -109,7 +109,7 @@ func (s *NationalFoodsStorage) UpdateNationalFood(in *pb.UpdateNationalFood) (*p
 }
 
 func (s *NationalFoodsStorage) GetNationalFoodByID(in *pb.NationalFoodId) (*pb.NationalFoodResponse, error) {
-	query := `SELECT id, food_name, food_type, nationality, description, ingredients, image_url, created_at, updated_at FROM foods WHERE id = $1`
+	query := `SELECT id, food_name, food_type, nationality, description, ingredients, image_url, created_at, updated_at FROM foods WHERE id = $1 and deleted_at = 0`
 
 	var food pb.NationalFoodResponse
 	if err := s.db.QueryRow(query, in.Id).Scan(&food.Id, &food.Name, &food.FoodType, &food.Nationality, &food.Description, &food.Ingredients, &food.ImageUrl, &food.CreatedAt, &food.UpdatedAt); err != nil {
