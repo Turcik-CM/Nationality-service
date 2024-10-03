@@ -23,6 +23,10 @@ func (s *HistoryStorage) AddHistorical(in *pb.Historical) (*pb.HistoricalRespons
 	id := uuid.New()
 	createdAt := time.Now()
 
+	if in.ImageUrl == "" {
+		in.ImageUrl = "no image"
+	}
+
 	query := `
 		INSERT INTO history (id, name, description, country, image_url, created_at)
 		VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`

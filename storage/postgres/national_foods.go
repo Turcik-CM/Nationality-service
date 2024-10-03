@@ -26,6 +26,10 @@ func (s *NationalFoodsStorage) CreateNationalFood(in *pb.NationalFood) (*pb.Nati
 	id := uuid.New()
 	createdAt := time.Now()
 
+	if in.ImageUrl == "" {
+		in.ImageUrl = "no image"
+	}
+
 	query := `
 		INSERT INTO foods (id, food_name, food_type, nationality, description, ingredients, image_url, created_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`
