@@ -17,7 +17,7 @@ func NewCountriesStorage(db *sqlx.DB) *CountriesStorage {
 }
 
 func (s *CountriesStorage) CreateCountry(in *pb.CreateCountryRequest) (*pb.CreateCountryResponse, error) {
-	fmt.Println(dodi)
+	fmt.Println("dodi")
 
 	query := `
         INSERT INTO countries (country, city, nationality, flag)
