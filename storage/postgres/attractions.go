@@ -22,11 +22,15 @@ func NewAttractionsStorage(db *sqlx.DB) *AttractionsStorage {
 func (s *AttractionsStorage) CreateAttraction(in *pb.Attraction) (*pb.AttractionResponse, error) {
 	id := uuid.New()
 
+	if in.ImageUrl == "" {
+		in.ImageUrl = "no image"
+	}
+
 	query := `
 		INSERT INTO attractions (id, category, name, description, country, location, created_at, image_url)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`
 
-	err := s.db.QueryRowContext(context.Background(), query, id, in.Category, in.Name, in.Description, in.Country, in.Location, time.Now(), "in null").Scan(&id)
+	err := s.db.QueryRowContext(context.Background(), query, id, in.Category, in.Name, in.Description, in.Country, in.Location, time.Now(), in.ImageUrl).Scan(&id)
 	if err != nil {
 		return nil, fmt.Errorf("error creating attraction: %v", err)
 	}
@@ -38,6 +42,7 @@ func (s *AttractionsStorage) CreateAttraction(in *pb.Attraction) (*pb.Attraction
 		Description: in.Description,
 		Country:     in.Country,
 		Location:    in.Location,
+		ImageUrl:    in.ImageUrl,
 	}, nil
 }
 
