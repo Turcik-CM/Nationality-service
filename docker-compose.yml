@@ -23,7 +23,7 @@ services:
 
   postgres_national:
     image: postgres:16.3
-    container_name: postgres_national
+    container_name: postgres_natio
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=dodi
