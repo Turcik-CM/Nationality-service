@@ -40,3 +40,19 @@ func TestCreateCountry(t *testing.T) {
 	}
 	fmt.Println(req)
 }
+
+func TestGetCountry(t *testing.T) {
+	db, err := Connect()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	h := NewCountriesStorage(db)
+	res, err := h.GetCountry(&pb.GetCountryRequest{
+		Id: "81bb127c-e323-453a-beb9-1e2bab7ac3b5",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(res)
+}

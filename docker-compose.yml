@@ -8,14 +8,14 @@ services:
       - ./migrations:/migrations
     command:
       [ "-path", "/migrations",
-        "-database", "postgres://postgres:dodi@postgres_national:5432/cmt?sslmode=disable",
+        "-database", "postgres://postgres:dodi@postgres_national:5432/cmd?sslmode=disable",
         "up"
       ]
     depends_on:
       postgres_national:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -h postgres_national -U postgres -d cmt"]
+      test: ["CMD-SHELL", "pg_isready -h postgres_national -U postgres -d cmd"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -27,11 +27,11 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=dodi
-      - POSTGRES_DB=cmt
+      - POSTGRES_DB=cmd
     networks:
       - TurkNet
     ports:
-      - 5434:5432
+      - 5433:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
