@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+
+  migrate:
+    image: "migrate/migrate"
+    networks:
+      - TurkNet
+    volumes:
+       - ./migrations:/migrations
+    command: [ "-path", "/migrations", "-database", "postgres://postgres:dodi@postgres_national:5432/cm?sslmode=disable", "up" ]
+    depends_on:
+      postgres_national:
+        condition: service_healthy
+
+  postgres_national:
+    image: postgres:16.3
+    container_name: postgres_national
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=dodi
+      - POSTGRES_DB=cm
+    networks:
+      - TurkNet
+    ports:
+      - 5434:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d postgres" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+
+  turk-national:
+    build: .
+    ports:
+      - 7080:7080
+    networks:
+      - TurkNet
+
+networks:
+  TurkNet:
+    name: TurkNet
+    driver: bridge
+
+volumes:
+  postgres_data:

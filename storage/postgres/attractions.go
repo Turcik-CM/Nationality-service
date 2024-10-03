@@ -19,16 +19,14 @@ func NewAttractionsStorage(db *sqlx.DB) *AttractionsStorage {
 	return &AttractionsStorage{db: db}
 }
 
-// CreateAttraction i nserts a new attraction into the database using Protobuf structures.
 func (s *AttractionsStorage) CreateAttraction(in *pb.Attraction) (*pb.AttractionResponse, error) {
 	id := uuid.New()
-	createdAt := time.Now()
 
 	query := `
-		INSERT INTO attractions (id, category, name, description, country, location, image_url, created_at)
+		INSERT INTO attractions (id, category, name, description, country, location, created_at, image_url)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`
 
-	err := s.db.QueryRowContext(context.Background(), query, id, in.Category, in.Name, in.Description, in.Country, in.Location, in.ImageUrl, createdAt).Scan(&id)
+	err := s.db.QueryRowContext(context.Background(), query, id, in.Category, in.Name, in.Description, in.Country, in.Location, time.Now(), "in null").Scan(&id)
 	if err != nil {
 		return nil, fmt.Errorf("error creating attraction: %v", err)
 	}
@@ -40,23 +38,22 @@ func (s *AttractionsStorage) CreateAttraction(in *pb.Attraction) (*pb.Attraction
 		Description: in.Description,
 		Country:     in.Country,
 		Location:    in.Location,
-		ImageUrl:    in.ImageUrl,
-		CreatedAt:   createdAt.String(),
 	}, nil
 }
 
 // GetAttractionByID retrieves an attraction by its ID using Protobuf.
 func (s *AttractionsStorage) GetAttractionByID(in *pb.AttractionId) (*pb.AttractionResponse, error) {
 	query := `
-		SELECT id, category, name, description, country, location, image_url, created_at, updated_at
+		SELECT id, category, description, country, location
 		FROM attractions
 		WHERE id = $1 AND deleted_at = 0`
 
 	var attraction pb.AttractionResponse
 	err := s.db.QueryRowContext(context.Background(), query, in.Id).Scan(
-		&attraction.Id, &attraction.Category, &attraction.Name, &attraction.Description, &attraction.Country,
-		&attraction.Location, &attraction.ImageUrl, &attraction.CreatedAt, &attraction.UpdatedAt,
+		&attraction.Id, &attraction.Category, &attraction.Description, &attraction.Country,
+		&attraction.Location,
 	)
+	fmt.Println(attraction)
 	if err != nil {
 		return nil, fmt.Errorf("error getting attraction by ID: %v", err)
 	}
@@ -207,7 +204,7 @@ func (s *AttractionsStorage) SearchAttractions(in *pb.AttractionSearch) (*pb.Att
 		SELECT id, category, name, description, country, location, image_url, created_at, updated_at
 		FROM attractions
 		WHERE (name ILIKE '%' || $1 || '%' OR description ILIKE '%' || $1 || '%') 
-		AND deleted_at = 0
+		AND deleted_at = 0 
 		LIMIT $2 OFFSET $3`
 
 	rows, err := s.db.QueryContext(context.Background(), query, in.SearchTerm, in.Limit, in.Offset)

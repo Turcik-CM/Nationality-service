@@ -28,8 +28,8 @@ func main() {
 	natSt := postgres.NewNationalFoodsStorage(db)
 	tourismSR := service.NewTourismService(hisSt, natSt, attSt, logger)
 
-	listen, err := net.Listen("tcp", cfg.NATIONALITY_SERVICE)
-	fmt.Println("Listening on " + cfg.NATIONALITY_SERVICE)
+	listen, err := net.Listen("tcp", cfg.NATIONAL_PORT)
+	fmt.Println("Listening on " + cfg.NATIONAL_PORT)
 	if err != nil {
 		logger.Error("Failed to listen to tourism")
 		log.Fatal(err)
@@ -39,7 +39,7 @@ func main() {
 	nationality.RegisterNationalityServiceServer(server, tourismSR)
 
 	if err := server.Serve(listen); err != nil {
-		logger.Error("Error starting server on port "+cfg.NATIONALITY_SERVICE, "error", err)
+		logger.Error("Error starting server on port "+cfg.NATIONAL_PORT, "error", err)
 		log.Fatal(err)
 	}
 }

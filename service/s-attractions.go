@@ -59,6 +59,15 @@ func (s *TourismService) AddAttractionImage(ctx context.Context, in *pb.Attracti
 	return req, nil
 }
 
+func (s *TourismService) SearchAttraction(ctx context.Context, in *pb.AttractionSearch) (*pb.AttractionListResponse, error) {
+	req, err := s.att.SearchAttractions(in)
+	if err != nil {
+		s.logger.Error("Error in SearchAttractions", err)
+		return nil, err
+	}
+	return req, nil
+}
+
 func (s *TourismService) RemoveHistoricalImage(ctx context.Context, in *pb.HistoricalImage) (*pb.Message, error) {
 	req, err := s.att.RemoveHistoricalImage(in)
 	if err != nil {
