@@ -1,4 +1,8 @@
-CREATE TYPE attraction_type AS ENUM ('nature', 'park', 'beach', 'national parks', 'culture', 'museum', 'lake');
+CREATE TABLE IF NOT EXISTS attraction_type(
+    id UUID DEFAULT gen_random_uuid(),
+    name VARCHAR PRIMARY KEY,
+    activity int
+);
 
 CREATE TABLE IF NOT EXISTS countries
 (
@@ -23,7 +27,7 @@ CREATE TABLE IF NOT EXISTS history
 CREATE TABLE IF NOT EXISTS attractions
 (
     id          UUID      DEFAULT gen_random_uuid(),
-    category    attraction_type,
+    category    VARCHAR REFERENCES attraction_type(name),
     name        VARCHAR(255) NOT NULL,
     description TEXT,
     country     VARCHAR REFERENCES countries (country),
@@ -31,19 +35,19 @@ CREATE TABLE IF NOT EXISTS attractions
     image_url   VARCHAR(255),
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at  BIGINT    DEFAULT 0 -- Added deleted_at for soft delete
+    deleted_at  BIGINT    DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS foods
 (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    food_name   VARCHAR(255) NOT NULL UNIQUE, -- Ensure food names are unique
-    food_type   VARCHAR(100),                 -- Specify a max length for better control
+    food_name   VARCHAR(255) NOT NULL UNIQUE,
+    food_type   VARCHAR(100),
     nationality VARCHAR(100),
     description TEXT,
     ingredients TEXT,
     image_url   VARCHAR(255),
     created_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
-    deleted_at  BIGINT           DEFAULT 0    -- Added deleted_at for soft delete
+    deleted_at  BIGINT           DEFAULT 0
 );
