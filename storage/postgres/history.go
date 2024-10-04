@@ -28,16 +28,15 @@ func (s *HistoryStorage) AddHistorical(in *pb.Historical) (*pb.HistoricalRespons
 	}
 
 	query := `
-		INSERT INTO history (id, name, description, country, image_url, created_at)
+		INSERT INTO history (id, name, description, city, image_url, created_at)
 		VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
 
-	if err := s.db.QueryRow(query, id, in.Name, in.Description, in.Country, in.ImageUrl, createdAt).Scan(&id); err != nil {
+	if err := s.db.QueryRow(query, id, in.Name, in.Description, in.City, in.ImageUrl, createdAt).Scan(&id); err != nil {
 		return nil, err
 	}
 
 	return &pb.HistoricalResponse{
 		Id:          id.String(),
-		Country:     in.Country,
 		City:        in.City,
 		Name:        in.Name,
 		Description: in.Description,
@@ -52,9 +51,9 @@ func (s *HistoryStorage) UpdateHistoricals(in *pb.UpdateHistorical) (*pb.Histori
 	argIndex := 1
 	updateFields := []string{}
 
-	if in.Country != "" {
-		updateFields = append(updateFields, fmt.Sprintf("country = $%d", argIndex))
-		args = append(args, in.Country)
+	if in.City != "" {
+		updateFields = append(updateFields, fmt.Sprintf("city = $%d", argIndex))
+		args = append(args, in.City)
 		argIndex++
 	}
 	if in.Name != "" {
@@ -83,7 +82,7 @@ func (s *HistoryStorage) UpdateHistoricals(in *pb.UpdateHistorical) (*pb.Histori
 	args = append(args, time.Now())
 	argIndex++
 
-	query += fmt.Sprintf(" WHERE id = $%d RETURNING id, name, description, country, image_url, created_at, updated_at", argIndex)
+	query += fmt.Sprintf(" WHERE id = $%d RETURNING id, name, description, city, image_url, created_at, updated_at", argIndex)
 	args = append(args, in.Id)
 
 	var res pb.HistoricalResponse
@@ -98,10 +97,10 @@ func (s *HistoryStorage) UpdateHistoricals(in *pb.UpdateHistorical) (*pb.Histori
 }
 
 func (s *HistoryStorage) GetHistoricalByID(in *pb.HistoricalId) (*pb.HistoricalResponse, error) {
-	query := `SELECT id, name, description, country, image_url, created_at, updated_at FROM history WHERE id = $1`
+	query := `SELECT id, name, description, city, image_url, created_at, updated_at FROM history WHERE id = $1`
 
 	var historical pb.HistoricalResponse
-	if err := s.db.QueryRow(query, in.Id).Scan(&historical.Id, &historical.Name, &historical.Description, &historical.Country, &historical.ImageUrl, &historical.CreatedAt, &historical.UpdatedAt); err != nil {
+	if err := s.db.QueryRow(query, in.Id).Scan(&historical.Id, &historical.Name, &historical.Description, &historical.City, &historical.ImageUrl, &historical.CreatedAt, &historical.UpdatedAt); err != nil {
 		return nil, err
 	}
 
@@ -120,11 +119,11 @@ func (s *HistoryStorage) DeleteHistorical(in *pb.HistoricalId) (*pb.Message, err
 }
 
 func (s *HistoryStorage) ListHistorical(in *pb.HistoricalList) (*pb.HistoricalListResponse, error) {
-	query := `SELECT id, name, description, country, image_url, created_at, updated_at FROM history WHERE 1=1`
+	query := `SELECT id, name, description, city, image_url, created_at, updated_at FROM history WHERE 1=1`
 	args := []interface{}{}
 	argIndex := 1
 	if in.Country != "" {
-		query += fmt.Sprintf(" AND country = $%d", argIndex)
+		query += fmt.Sprintf(" AND city = $%d", argIndex)
 		args = append(args, in.Country)
 		argIndex++
 	}
@@ -159,7 +158,7 @@ func (s *HistoryStorage) ListHistorical(in *pb.HistoricalList) (*pb.HistoricalLi
 }
 
 func (s *HistoryStorage) SearchHistorical(in *pb.HistoricalSearch) (*pb.HistoricalListResponse, error) {
-	query := `SELECT id, name, description, country, image_url, created_at FROM history WHERE name ILIKE '%' || $1 || '%' or description ILIKE '%' || $1 || '%'`
+	query := `SELECT id, name, description, city, image_url, created_at FROM history WHERE name ILIKE '%' || $1 || '%' or description ILIKE '%' || $1 || '%'`
 	args := []interface{}{in.Search}
 
 	rows, err := s.db.Query(query, args...)
@@ -171,7 +170,7 @@ func (s *HistoryStorage) SearchHistorical(in *pb.HistoricalSearch) (*pb.Historic
 	var historicals []*pb.HistoricalResponse
 	for rows.Next() {
 		var historical pb.HistoricalResponse
-		if err := rows.Scan(&historical.Id, &historical.Name, &historical.Description, &historical.Country, &historical.ImageUrl, &historical.CreatedAt, &historical.UpdatedAt); err != nil {
+		if err := rows.Scan(&historical.Id, &historical.Name, &historical.Description, &historical.City, &historical.ImageUrl, &historical.CreatedAt); err != nil {
 			return nil, err
 		}
 		historicals = append(historicals, &historical)
