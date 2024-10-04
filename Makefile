@@ -1,5 +1,5 @@
 CURRENT_DIR := $(shell pwd)
-DATABASE_URL := postgres://postgres:dodi@localhost:5432/cmt?sslmode=disable
+DATABASE_URL := postgres://postgres:123321@localhost:5432/turk_nation?sslmode=disable
 
 DB_URL := postgres://postgres:123321@localhost:5432/turk_nation?sslmode=disable
 
