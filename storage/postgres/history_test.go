@@ -18,7 +18,6 @@ func TestAddHistorical(t *testing.T) {
 	defer db.Close()
 
 	res := pb.Historical{
-		Country:     "Uzbekistan",
 		City:        "dodi",
 		Name:        "dodi",
 		Description: "dodi",
@@ -45,7 +44,7 @@ func TestUpdateHistoricals(t *testing.T) {
 	}
 	defer db.Close()
 	res := pb.UpdateHistorical{
-		Id:          "cc39cd85-20be-4a7b-9aaa-065f9e7d5ae5",
+		Id:          "fc8448fd-11d6-4f0a-bc58-077fb3b94be9",
 		Description: "nimadur",
 	}
 
@@ -87,7 +86,8 @@ func TestListHistorical(t *testing.T) {
 	}
 	defer db.Close()
 	res := pb.HistoricalList{
-		City: "dodi",
+		Limit: 1,
+		City:  "dodi",
 	}
 	his := NewHistoryStorage(db)
 	req, err := his.ListHistorical(&res)
@@ -148,7 +148,7 @@ func TestDeleteHistorical(t *testing.T) {
 	}
 	defer db.Close()
 	res := pb.HistoricalId{
-		Id: "5285c51e-7216-4b85-8023-709e1a7a8406",
+		Id: "cc39cd85-20be-4a7b-9aaa-065f9e7d5ae5",
 	}
 	his := NewHistoryStorage(db)
 	req, err := his.DeleteHistorical(&res)
