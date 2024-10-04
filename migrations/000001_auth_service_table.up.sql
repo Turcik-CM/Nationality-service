@@ -17,8 +17,7 @@ CREATE TABLE IF NOT EXISTS cities
 (
     id          UUID DEFAULT gen_random_uuid(),
     country_id  UUID REFERENCES countries (id),
-    name        VARCHAR PRIMARY KEY,
-    nationality VARCHAR
+    name        VARCHAR PRIMARY KEY
 );
 
 CREATE TABLE IF NOT EXISTS history

@@ -28,10 +28,8 @@ func TestCreateCountry(t *testing.T) {
 	h := NewCountriesStorage(db)
 
 	res := pb.CreateCountryRequest{
-		Country:     "dodi1",
-		City:        "dodi1",
-		Nationality: "dodi1",
-		ImageUrl:    "dodi1",
+		Name:     "dodi",
+		ImageUrl: "dodi",
 	}
 
 	req, err := h.CreateCountry(&res)
@@ -49,7 +47,7 @@ func TestGetCountry(t *testing.T) {
 	defer db.Close()
 	h := NewCountriesStorage(db)
 	res, err := h.GetCountry(&pb.GetCountryRequest{
-		Id: "92a7fc4b-bb19-46a9-85d2-7fc9cdac3e05",
+		Id: "8033c910-b040-42cd-a8c2-545171d75303",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -65,8 +63,8 @@ func TestUpdateCountry(t *testing.T) {
 	defer db.Close()
 	h := NewCountriesStorage(db)
 	res, err := h.UpdateCountry(&pb.UpdateCountryRequest{
-		Id:      "1582b2e1-45e8-4786-85cb-9cd219d3b140",
-		Country: "dodi222",
+		Id:   "8033c910-b040-42cd-a8c2-545171d75303",
+		Name: "dodi",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -98,11 +96,111 @@ func TestListCountries(t *testing.T) {
 	defer db.Close()
 	h := NewCountriesStorage(db)
 	res, err := h.ListCountries(&pb.ListCountriesRequest{
-		Limit:   2,
-		Country: "dodi222",
+		Limit: 2,
+		Name:  "dodi",
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 	fmt.Println(res)
+}
+
+//=====================================
+
+func TestCreateCity(t *testing.T) {
+	db, err := Connect()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	h := NewCountriesStorage(db)
+	res, err := h.CreateCity(&pb.CreateCityRequest{
+		CountryId: "8033c910-b040-42cd-a8c2-545171d75303",
+		Name:      "sd",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(res)
+}
+
+func TestGetCity(t *testing.T) {
+	db, err := Connect()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	h := NewCountriesStorage(db)
+	res, err := h.GetCity(&pb.GetCityRequest{
+		Id: "a313d1aa-bf9e-4d28-a942-15f2a4c674cc",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(res)
+}
+
+func TestUpdateCity(t *testing.T) {
+	db, err := Connect()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	h := NewCountriesStorage(db)
+	req, err := h.UpdateCity(&pb.CreateCityResponse{
+		Id:   "a313d1aa-bf9e-4d28-a942-15f2a4c674cc",
+		Name: "dodi",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(req)
+}
+
+func TestDeleteCity(t *testing.T) {
+	db, err := Connect()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	h := NewCountriesStorage(db)
+	req, err := h.DeleteCity(&pb.GetCityRequest{
+		Id: "c4647fe8-e5dd-4c1c-960a-6ca72e8e35e0",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(req)
+}
+
+func TestListCity(t *testing.T) {
+	db, err := Connect()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	h := NewCountriesStorage(db)
+	res, err := h.ListCity(&pb.ListCityRequest{
+		Limit: 2,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(res)
+}
+
+func TestGetBYCount(t *testing.T) {
+	db, err := Connect()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	h := NewCountriesStorage(db)
+	req, err := h.GetBYCount(&pb.CountryId{
+		Id: "8033c910-b040-42cd-a8c2-545171d75303",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fmt.Println(req)
 }

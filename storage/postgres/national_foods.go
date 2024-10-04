@@ -31,20 +31,20 @@ func (s *NationalFoodsStorage) CreateNationalFood(in *pb.NationalFood) (*pb.Nati
 	}
 
 	query := `
-		INSERT INTO foods (id, food_name, food_type, nationality, description, ingredients, image_url, created_at)
+		INSERT INTO foods (id, food_name, food_type, country_id, description, ingredients, image_url, created_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`
 
-	if err := s.db.QueryRow(query, id, in.Name, in.FoodType, in.Nationality, in.Description, in.Ingredients, in.ImageUrl, createdAt).Scan(&id); err != nil {
+	if err := s.db.QueryRow(query, id, in.FoodName, in.FoodType, in.CountryId, in.Description, in.Ingredients, in.ImageUrl, createdAt).Scan(&id); err != nil {
 		return nil, err
 	}
 
 	return &pb.NationalFoodResponse{
 		Id:          id.String(),
-		Country:     in.Country,
-		Name:        in.Name,
+		FoodType:    in.FoodType,
+		FoodName:    in.FoodName,
 		Description: in.Description,
+		CountryId:   in.CountryId,
 		ImageUrl:    in.ImageUrl,
-		Rating:      in.Rating,
 		CreatedAt:   createdAt.String(),
 	}, nil
 }
@@ -55,9 +55,9 @@ func (s *NationalFoodsStorage) UpdateNationalFood(in *pb.UpdateNationalFood) (*p
 	argIndex := 1
 	updateFields := []string{}
 
-	if in.Name != "" {
+	if in.FoodName != "" {
 		updateFields = append(updateFields, fmt.Sprintf("food_name = $%d", argIndex))
-		args = append(args, in.Name)
+		args = append(args, in.FoodName)
 		argIndex++
 	}
 	if in.FoodType != "" {
@@ -65,9 +65,9 @@ func (s *NationalFoodsStorage) UpdateNationalFood(in *pb.UpdateNationalFood) (*p
 		args = append(args, in.FoodType)
 		argIndex++
 	}
-	if in.Nationality != "" {
-		updateFields = append(updateFields, fmt.Sprintf("nationality = $%d", argIndex))
-		args = append(args, in.Nationality)
+	if in.CountryId != "" {
+		updateFields = append(updateFields, fmt.Sprintf("country_id = $%d", argIndex))
+		args = append(args, in.CountryId)
 		argIndex++
 	}
 	if in.Description != "" {
@@ -94,12 +94,12 @@ func (s *NationalFoodsStorage) UpdateNationalFood(in *pb.UpdateNationalFood) (*p
 		return nil, fmt.Errorf("no fields were updated")
 	}
 
-	query += fmt.Sprintf(" WHERE id = $%d RETURNING id, food_name, food_type, nationality, description, ingredients, image_url, created_at, updated_at", argIndex)
+	query += fmt.Sprintf(" WHERE id = $%d RETURNING id, food_name, food_type, country_id, description, ingredients, image_url, created_at", argIndex)
 	args = append(args, in.Id)
 
 	var res pb.NationalFoodResponse
 	err := s.db.QueryRowContext(context.Background(), query, args...).Scan(
-		&res.Id, &res.Name, &res.FoodType, &res.Nationality, &res.Description, &res.Ingredients, &res.ImageUrl, &res.CreatedAt, &res.UpdatedAt)
+		&res.Id, &res.FoodName, &res.FoodType, &res.CountryId, &res.Description, &res.Ingredients, &res.ImageUrl, &res.CreatedAt)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to update national food: %v", err)
@@ -109,10 +109,10 @@ func (s *NationalFoodsStorage) UpdateNationalFood(in *pb.UpdateNationalFood) (*p
 }
 
 func (s *NationalFoodsStorage) GetNationalFoodByID(in *pb.NationalFoodId) (*pb.NationalFoodResponse, error) {
-	query := `SELECT id, food_name, food_type, nationality, description, ingredients, image_url, created_at, updated_at FROM foods WHERE id = $1 and deleted_at = 0`
+	query := `SELECT id, food_name, food_type, country_id, description, ingredients, image_url, created_at FROM foods WHERE id = $1 and deleted_at = 0`
 
 	var food pb.NationalFoodResponse
-	if err := s.db.QueryRow(query, in.Id).Scan(&food.Id, &food.Name, &food.FoodType, &food.Nationality, &food.Description, &food.Ingredients, &food.ImageUrl, &food.CreatedAt, &food.UpdatedAt); err != nil {
+	if err := s.db.QueryRow(query, in.Id).Scan(&food.Id, &food.FoodName, &food.FoodType, &food.CountryId, &food.Description, &food.Ingredients, &food.ImageUrl, &food.CreatedAt); err != nil {
 		return nil, err
 	}
 
@@ -131,13 +131,13 @@ func (s *NationalFoodsStorage) DeleteNationalFood(in *pb.NationalFoodId) (*pb.Me
 }
 
 func (s *NationalFoodsStorage) ListNationalFoods(in *pb.NationalFoodList) (*pb.NationalFoodListResponse, error) {
-	query := `SELECT id, food_name, food_type, nationality, description, ingredients, image_url, created_at, updated_at FROM foods WHERE deleted_at = 0`
+	query := `SELECT id, food_name, food_type, country_id, description, ingredients, image_url, created_at FROM foods WHERE deleted_at = 0`
 	args := []interface{}{}
 	argIndex := 1
 
-	if in.Country != "" {
-		query += fmt.Sprintf(" AND nationality = $%d", argIndex)
-		args = append(args, in.Country)
+	if in.CountryId != "" {
+		query += fmt.Sprintf(" AND country_id = $%d", argIndex)
+		args = append(args, in.CountryId)
 		argIndex++
 	}
 
@@ -162,7 +162,7 @@ func (s *NationalFoodsStorage) ListNationalFoods(in *pb.NationalFoodList) (*pb.N
 	var foods []*pb.NationalFoodResponse
 	for rows.Next() {
 		var food pb.NationalFoodResponse
-		if err := rows.Scan(&food.Id, &food.Name, &food.FoodType, &food.Nationality, &food.Description, &food.Ingredients, &food.ImageUrl, &food.CreatedAt, &food.UpdatedAt); err != nil {
+		if err := rows.Scan(&food.Id, &food.FoodName, &food.FoodType, &food.CountryId, &food.Description, &food.Ingredients, &food.ImageUrl, &food.CreatedAt); err != nil {
 			return nil, err
 		}
 		foods = append(foods, &food)

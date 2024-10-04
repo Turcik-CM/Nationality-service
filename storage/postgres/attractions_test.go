@@ -9,19 +9,17 @@ import (
 )
 
 func TestCreateAttraction(t *testing.T) {
-	cfg := config.Load()
-
-	db, err := ConnectPostgres(cfg)
+	db, err := Connect()
 	if err != nil {
 		t.Errorf("Failed to connect to database: %v", err)
 		return
 	}
 	defer db.Close()
 	res := pb.Attraction{
-		Country:     "Uzbekistan",
+		City:        "dodi",
 		Name:        "dodi",
 		Description: "dodi",
-		Category:    "culture",
+		Category:    "dodi",
 		Location:    "dodi",
 		ImageUrl:    "dodi",
 		CreatedAt:   time.Now().String(),
@@ -48,7 +46,7 @@ func TestGetAttractionByID(t *testing.T) {
 	atts := NewAttractionsStorage(db)
 
 	res := pb.AttractionId{
-		Id: "fd2ceee5-e9c9-42d1-9f35-2488d3fb3f30",
+		Id: "320eb221-d72b-4334-9ecb-751a09ab89a4",
 	}
 
 	req, err := atts.GetAttractionByID(&res)
@@ -69,7 +67,7 @@ func TestUpdateAttraction(t *testing.T) {
 	defer db.Close()
 	atts := NewAttractionsStorage(db)
 	res := pb.UpdateAttraction{
-		Id:   "fd2ceee5-e9c9-42d1-9f35-2488d3fb3f30",
+		Id:   "320eb221-d72b-4334-9ecb-751a09ab89a4",
 		Name: "dodi dodi",
 	}
 	req, err := atts.UpdateAttraction(&res)
@@ -90,7 +88,7 @@ func TestListAttractions(t *testing.T) {
 	defer db.Close()
 	atts := NewAttractionsStorage(db)
 	res := pb.AttractionList{
-		Category: "culture",
+		Category: "dodi",
 	}
 	req, err := atts.ListAttractions(&res)
 	if err != nil {
@@ -132,7 +130,7 @@ func TestAddImageUrl(t *testing.T) {
 	atts := NewAttractionsStorage(db)
 
 	res := pb.AttractionImage{
-		Id:       "af35d7ee-6bf1-4f2b-981e-f49da6b2f266",
+		Id:       "320eb221-d72b-4334-9ecb-751a09ab89a4",
 		ImageUrl: "2222",
 	}
 	req, err := atts.AddImageUrl(&res)
@@ -153,7 +151,7 @@ func TestDeleteAttraction(t *testing.T) {
 	defer db.Close()
 	atts := NewAttractionsStorage(db)
 	res := pb.AttractionId{
-		Id: "fd2ceee5-e9c9-42d1-9f35-2488d3fb3f30",
+		Id: "320eb221-d72b-4334-9ecb-751a09ab89a4",
 	}
 	req, err := atts.DeleteAttraction(&res)
 	if err != nil {
@@ -191,7 +189,7 @@ func TestCreateAttractionType(t *testing.T) {
 	defer db.Close()
 	atts := NewAttractionsStorage(db)
 	res := pb.CreateAttractionTypeRequest{
-		Name:     "dodi",
+		Name:     "dodi1",
 		Activity: 1222,
 	}
 	req, err := atts.CreateAttractionType(&res)
@@ -209,7 +207,7 @@ func TestGetAttractionTypeByID(t *testing.T) {
 	defer db.Close()
 	atts := NewAttractionsStorage(db)
 	res := pb.GetAttractionTypeRequest{
-		Id: "d3bf65d9-89fa-4378-82cc-7af465130802",
+		Id: "d3a7610b-f07e-467e-9c3f-08c84e16a079",
 	}
 	req, err := atts.GetAttractionTypeByID(&res)
 	if err != nil {
@@ -227,7 +225,7 @@ func TestUpdateAttractionType(t *testing.T) {
 	atts := NewAttractionsStorage(db)
 	res := pb.UpdateAttractionTypeRequest{
 		Name: "1221",
-		Id:   "d3bf65d9-89fa-4378-82cc-7af465130802",
+		Id:   "d3a7610b-f07e-467e-9c3f-08c84e16a079",
 	}
 	req, err := atts.UpdateAttractionType(&res)
 	if err != nil {
@@ -244,7 +242,7 @@ func TestDeleteAttractionType(t *testing.T) {
 	defer db.Close()
 	atts := NewAttractionsStorage(db)
 	res := pb.DeleteAttractionTypeRequest{
-		Id: "6a40ddac-6435-4591-825c-689bf8dc663e",
+		Id: "d3a7610b-f07e-467e-9c3f-08c84e16a079",
 	}
 	req, err := atts.DeleteAttractionType(&res)
 	if err != nil {
@@ -262,7 +260,7 @@ func TestListAttractionTypes(t *testing.T) {
 	atts := NewAttractionsStorage(db)
 	res := pb.ListAttractionTypesRequest{
 		Limit: 1,
-		Name:  "1221",
+		Name:  "dodi",
 	}
 	req, err := atts.ListAttractionTypes(&res)
 	if err != nil {

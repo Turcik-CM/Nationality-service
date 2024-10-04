@@ -27,10 +27,10 @@ func (s *AttractionsStorage) CreateAttraction(in *pb.Attraction) (*pb.Attraction
 	}
 
 	query := `
-		INSERT INTO attractions (id, category, name, description, country, location, created_at, image_url)
+		INSERT INTO attractions (id, category, name, description, city, location, created_at, image_url)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`
 
-	err := s.db.QueryRowContext(context.Background(), query, id, in.Category, in.Name, in.Description, in.Country, in.Location, time.Now(), in.ImageUrl).Scan(&id)
+	err := s.db.QueryRowContext(context.Background(), query, id, in.Category, in.Name, in.Description, in.City, in.Location, time.Now(), in.ImageUrl).Scan(&id)
 	if err != nil {
 		return nil, fmt.Errorf("error creating attraction: %v", err)
 	}
@@ -40,25 +40,23 @@ func (s *AttractionsStorage) CreateAttraction(in *pb.Attraction) (*pb.Attraction
 		Category:    in.Category,
 		Name:        in.Name,
 		Description: in.Description,
-		Country:     in.Country,
+		City:        in.City,
 		Location:    in.Location,
 		ImageUrl:    in.ImageUrl,
 	}, nil
 }
 
-// GetAttractionByID retrieves an attraction by its ID using Protobuf.
 func (s *AttractionsStorage) GetAttractionByID(in *pb.AttractionId) (*pb.AttractionResponse, error) {
 	query := `
-		SELECT id, category, description, country, location
+		SELECT id, category, description, city, location
 		FROM attractions
 		WHERE id = $1 AND deleted_at = 0`
 
 	var attraction pb.AttractionResponse
 	err := s.db.QueryRowContext(context.Background(), query, in.Id).Scan(
-		&attraction.Id, &attraction.Category, &attraction.Description, &attraction.Country,
+		&attraction.Id, &attraction.Category, &attraction.Description, &attraction.City,
 		&attraction.Location,
 	)
-	fmt.Println(&attraction)
 	if err != nil {
 		return nil, fmt.Errorf("error getting attraction by ID: %v", err)
 	}
@@ -66,7 +64,6 @@ func (s *AttractionsStorage) GetAttractionByID(in *pb.AttractionId) (*pb.Attract
 	return &attraction, nil
 }
 
-// UpdateAttraction updates an existing attraction using Protobuf.
 func (s *AttractionsStorage) UpdateAttraction(in *pb.UpdateAttraction) (*pb.AttractionResponse, error) {
 	query := `UPDATE attractions SET`
 	args := []interface{}{}
@@ -88,9 +85,9 @@ func (s *AttractionsStorage) UpdateAttraction(in *pb.UpdateAttraction) (*pb.Attr
 		args = append(args, in.Description)
 		argIndex++
 	}
-	if in.Country != "" {
-		updateFields = append(updateFields, fmt.Sprintf("country = $%d", argIndex))
-		args = append(args, in.Country)
+	if in.City != "" {
+		updateFields = append(updateFields, fmt.Sprintf("city = $%d", argIndex))
+		args = append(args, in.City)
 		argIndex++
 	}
 	if in.Location != "" {
@@ -112,13 +109,13 @@ func (s *AttractionsStorage) UpdateAttraction(in *pb.UpdateAttraction) (*pb.Attr
 	args = append(args, time.Now())
 	argIndex++
 
-	query += fmt.Sprintf(" %s WHERE id = $%d RETURNING id, category, name, description, country, location, image_url, created_at, updated_at",
+	query += fmt.Sprintf(" %s WHERE id = $%d RETURNING id, category, name, description, city, location, image_url, created_at, updated_at",
 		strings.Join(updateFields, ", "), argIndex)
 	args = append(args, in.Id)
 
 	var updated pb.AttractionResponse
 	err := s.db.QueryRowContext(context.Background(), query, args...).Scan(
-		&updated.Id, &updated.Category, &updated.Name, &updated.Description, &updated.Country,
+		&updated.Id, &updated.Category, &updated.Name, &updated.Description, &updated.City,
 		&updated.Location, &updated.ImageUrl, &updated.CreatedAt, &updated.UpdatedAt,
 	)
 	if err != nil {
@@ -128,7 +125,6 @@ func (s *AttractionsStorage) UpdateAttraction(in *pb.UpdateAttraction) (*pb.Attr
 	return &updated, nil
 }
 
-// DeleteAttraction soft deletes an attraction by setting the deleted_at field.
 func (s *AttractionsStorage) DeleteAttraction(in *pb.AttractionId) (*pb.Message, error) {
 	query := `update attractions set deleted_at = date_part('epoch', current_timestamp)::INT
                   where id = $1 and deleted_at = 0`
@@ -143,16 +139,16 @@ func (s *AttractionsStorage) DeleteAttraction(in *pb.AttractionId) (*pb.Message,
 
 func (s *AttractionsStorage) ListAttractions(in *pb.AttractionList) (*pb.AttractionListResponse, error) {
 	query := `
-		SELECT id, category, name, description, country, location, image_url, created_at, updated_at
+		SELECT id, category, name, description, city, location, image_url, created_at, updated_at
 		FROM attractions
 		WHERE deleted_at = 0`
 
 	var args []interface{}
 	argIndex := 1
 
-	if in.Country != "" {
-		query += fmt.Sprintf(" AND country = $%d", argIndex)
-		args = append(args, in.Country)
+	if in.City != "" {
+		query += fmt.Sprintf(" AND city = $%d", argIndex)
+		args = append(args, in.City)
 		argIndex++
 	}
 	if in.Category != "" {
@@ -190,7 +186,7 @@ func (s *AttractionsStorage) ListAttractions(in *pb.AttractionList) (*pb.Attract
 	var attractions []*pb.AttractionResponse
 	for rows.Next() {
 		var attraction pb.AttractionResponse
-		if err := rows.Scan(&attraction.Id, &attraction.Category, &attraction.Name, &attraction.Description, &attraction.Country, &attraction.Location, &attraction.ImageUrl, &attraction.CreatedAt, &attraction.UpdatedAt); err != nil {
+		if err := rows.Scan(&attraction.Id, &attraction.Category, &attraction.Name, &attraction.Description, &attraction.City, &attraction.Location, &attraction.ImageUrl, &attraction.CreatedAt, &attraction.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("error scanning attraction: %v", err)
 		}
 		attractions = append(attractions, &attraction)
@@ -203,10 +199,9 @@ func (s *AttractionsStorage) ListAttractions(in *pb.AttractionList) (*pb.Attract
 	return &pb.AttractionListResponse{Attractions: attractions}, nil
 }
 
-// SearchAttractions searches for attractions by name or description.
 func (s *AttractionsStorage) SearchAttractions(in *pb.AttractionSearch) (*pb.AttractionListResponse, error) {
 	query := `
-		SELECT id, category, name, description, country, location, image_url, created_at, updated_at
+		SELECT id, category, name, description, city, location, image_url, created_at, updated_at
 		FROM attractions
 		WHERE (name ILIKE '%' || $1 || '%' OR description ILIKE '%' || $1 || '%') 
 		AND deleted_at = 0 
@@ -221,7 +216,7 @@ func (s *AttractionsStorage) SearchAttractions(in *pb.AttractionSearch) (*pb.Att
 	var attractions []*pb.AttractionResponse
 	for rows.Next() {
 		var attraction pb.AttractionResponse
-		if err := rows.Scan(&attraction.Id, &attraction.Category, &attraction.Name, &attraction.Description, &attraction.Country, &attraction.Location, &attraction.ImageUrl, &attraction.CreatedAt, &attraction.UpdatedAt); err != nil {
+		if err := rows.Scan(&attraction.Id, &attraction.Category, &attraction.Name, &attraction.Description, &attraction.City, &attraction.Location, &attraction.ImageUrl, &attraction.CreatedAt, &attraction.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("error scanning attraction: %v", err)
 		}
 		attractions = append(attractions, &attraction)

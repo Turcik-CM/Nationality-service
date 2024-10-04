@@ -17,13 +17,11 @@ func TestCreateNationalFood(t *testing.T) {
 	}
 	defer db.Close()
 	res := pb.NationalFood{
-		Country:     "Uzbekistan",
-		Name:        "dodi",
+		FoodName:    "dodi",
+		FoodType:    "dodi",
 		Description: "dodi",
-		Nationality: "dodi",
+		CountryId:   "2140e218-b8fd-4ff0-a5c7-bd18dccffc08",
 		ImageUrl:    "null",
-		Rating:      1200000,
-		FoodType:    "nimadur",
 		Ingredients: "dodi",
 		CreatedAt:   time.Now().String(),
 	}
@@ -46,8 +44,8 @@ func TestUpdateNationalFood(t *testing.T) {
 	}
 	defer db.Close()
 	res := pb.UpdateNationalFood{
-		Id:   "da8b54e8-0675-4b22-8970-46d8af4f3dbf",
-		Name: "1111",
+		Id:       "aebdac5f-9e20-437a-9a69-0b16e7352c42",
+		FoodName: "5455",
 	}
 	food := NewNationalFoodsStorage(db)
 	req, err := food.UpdateNationalFood(&res)
@@ -67,7 +65,7 @@ func TestGetNationalFoodByID(t *testing.T) {
 	}
 	defer db.Close()
 	res := pb.NationalFoodId{
-		Id: "da8b54e8-0675-4b22-8970-46d8af4f3dbf",
+		Id: "aebdac5f-9e20-437a-9a69-0b16e7352c42",
 	}
 	food := NewNationalFoodsStorage(db)
 
@@ -110,7 +108,7 @@ func TestAddImageUrll(t *testing.T) {
 	defer db.Close()
 
 	res := pb.NationalFoodImage{
-		Id:       "da8b54e8-0675-4b22-8970-46d8af4f3dbf",
+		Id:       "aebdac5f-9e20-437a-9a69-0b16e7352c42",
 		ImageUrl: "rans joylandi",
 	}
 	food := NewNationalFoodsStorage(db)
@@ -131,7 +129,7 @@ func TestDeleteNationalFood(t *testing.T) {
 	}
 	defer db.Close()
 	res := pb.NationalFoodId{
-		Id: "1a5032a0-01b8-4c3b-93b7-726c9e09aab9",
+		Id: "aebdac5f-9e20-437a-9a69-0b16e7352c42",
 	}
 	food := NewNationalFoodsStorage(db)
 	req, err := food.DeleteNationalFood(&res)
