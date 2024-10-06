@@ -111,7 +111,7 @@ func (s *CountriesStorage) DeleteCountry(in *pb.DeleteCountryRequest) (*pb.Messa
 
 func (s *CountriesStorage) ListCountries(in *pb.ListCountriesRequest) (*pb.ListCountriesResponse, error) {
 	query := `
-        SELECT id, name, flag
+        SELECT COUNT(*) OVER(), id, name, flag
         FROM countries where 1=1
     `
 	args := []interface{}{}
@@ -141,10 +141,11 @@ func (s *CountriesStorage) ListCountries(in *pb.ListCountriesRequest) (*pb.ListC
 	}
 	defer rows.Close()
 
+	var total string
 	var countries []*pb.Country
 	for rows.Next() {
 		var country pb.Country
-		if err := rows.Scan(&country.Id, &country.Name, &country.ImageUrl); err != nil {
+		if err := rows.Scan(&total, &country.Id, &country.Name, &country.ImageUrl); err != nil {
 			return nil, fmt.Errorf("error scanning country: %v", err)
 		}
 		countries = append(countries, &country)
@@ -154,7 +155,10 @@ func (s *CountriesStorage) ListCountries(in *pb.ListCountriesRequest) (*pb.ListC
 		return nil, fmt.Errorf("error during row iteration: %v", err)
 	}
 
-	return &pb.ListCountriesResponse{Countries: countries}, nil
+	return &pb.ListCountriesResponse{
+		Countries: countries,
+		Total:     total,
+	}, nil
 }
 
 //===========================================================

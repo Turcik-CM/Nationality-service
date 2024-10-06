@@ -341,7 +341,7 @@ func (s *AttractionsStorage) DeleteAttractionType(in *pb.DeleteAttractionTypeReq
 }
 func (s *AttractionsStorage) ListAttractionTypes(in *pb.ListAttractionTypesRequest) (*pb.ListAttractionTypesResponse, error) {
 	query := `
-        SELECT id, name, activity
+        SELECT COUNT(*) OVER(), id, name, activity
         FROM attraction_types where 1=1
     `
 
@@ -372,10 +372,11 @@ func (s *AttractionsStorage) ListAttractionTypes(in *pb.ListAttractionTypesReque
 	}
 	defer rows.Close()
 
+	var total string
 	var attractionTypes []*pb.AttractionType1
 	for rows.Next() {
 		var attractionType pb.AttractionType1
-		if err := rows.Scan(&attractionType.Id, &attractionType.Name, &attractionType.Activity); err != nil {
+		if err := rows.Scan(&total, &attractionType.Id, &attractionType.Name, &attractionType.Activity); err != nil {
 			return nil, fmt.Errorf("error scanning attraction type: %v", err)
 		}
 		attractionTypes = append(attractionTypes, &attractionType)
@@ -385,5 +386,8 @@ func (s *AttractionsStorage) ListAttractionTypes(in *pb.ListAttractionTypesReque
 		return nil, fmt.Errorf("error during row iteration: %v", err)
 	}
 
-	return &pb.ListAttractionTypesResponse{AttractionTypes: attractionTypes}, nil
+	return &pb.ListAttractionTypesResponse{
+		AttractionTypes: attractionTypes,
+		Total:           total,
+	}, nil
 }

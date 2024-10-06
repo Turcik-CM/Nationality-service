@@ -260,8 +260,8 @@ func TestListAttractionTypes(t *testing.T) {
 	defer db.Close()
 	atts := NewAttractionsStorage(db)
 	res := pb.ListAttractionTypesRequest{
-		Limit: 1,
-		Name:  "dodi",
+		Limit: 2,
+		//Name:  "dodi",
 	}
 	req, err := atts.ListAttractionTypes(&res)
 	if err != nil {
