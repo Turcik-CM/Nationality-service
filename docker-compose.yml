@@ -8,7 +8,7 @@ services:
     volumes:
       - ./migrations:/migrations
     command:
-      [ "-path", "/migrations", "-database", "postgres://postgres:dodi@postgres_post:5432/cmt?sslmode=disable", "up" ]
+      [ "-path", "/migrations", "-database", "postgres://postgres:dodi@postgres_national:5432/cmt?sslmode=disable", "up" ]
     depends_on:
       postgres_national:
         condition: service_healthy
