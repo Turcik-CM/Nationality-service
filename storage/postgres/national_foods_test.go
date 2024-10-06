@@ -17,9 +17,9 @@ func TestCreateNationalFood(t *testing.T) {
 	}
 	defer db.Close()
 	res := pb.NationalFood{
-		FoodName:    "dodi",
-		FoodType:    "dodi",
-		Description: "dodi",
+		FoodName:    "dodi12",
+		FoodType:    "dodi2",
+		Description: "dodi12",
 		CountryId:   "2140e218-b8fd-4ff0-a5c7-bd18dccffc08",
 		ImageUrl:    "null",
 		Ingredients: "dodi",
@@ -86,8 +86,9 @@ func TestListNationalFoods(t *testing.T) {
 	}
 	defer db.Close()
 	res := pb.NationalFoodList{
-		Limit:  1,
-		Offset: 0,
+		//Limit: 1,
+		//Offset: 0,
+		CountryId: "2140e218-b8fd-4ff0-a5c7-bd18dccffc08",
 	}
 	foods := NewNationalFoodsStorage(db)
 	req, err := foods.ListNationalFoods(&res)

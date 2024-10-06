@@ -19,7 +19,7 @@ func TestCreateAttraction(t *testing.T) {
 		City:        "dodi",
 		Name:        "dodi",
 		Description: "dodi",
-		Category:    "dodi",
+		Category:    "111",
 		Location:    "dodi",
 		ImageUrl:    "dodi",
 		CreatedAt:   time.Now().String(),
@@ -88,7 +88,8 @@ func TestListAttractions(t *testing.T) {
 	defer db.Close()
 	atts := NewAttractionsStorage(db)
 	res := pb.AttractionList{
-		Category: "dodi",
+		Name: "dodi",
+		//Category: "dodi",
 	}
 	req, err := atts.ListAttractions(&res)
 	if err != nil {

@@ -181,7 +181,7 @@ func TestListCity(t *testing.T) {
 	defer db.Close()
 	h := NewCountriesStorage(db)
 	res, err := h.ListCity(&pb.ListCityRequest{
-		Limit: 2,
+		Name: "dodi",
 	})
 	if err != nil {
 		t.Fatal(err)

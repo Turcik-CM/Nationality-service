@@ -119,8 +119,8 @@ func (s *HistoryStorage) DeleteHistorical(in *pb.HistoricalId) (*pb.Message, err
 }
 
 func (s *HistoryStorage) ListHistorical(in *pb.HistoricalList) (*pb.HistoricalListResponse, error) {
-	query := `SELECT id, name, description, city, image_url, created_at, updated_at FROM history WHERE 1=1`
-	args := []interface{}{}
+	query := `SELECT COUNT(*) OVER(), id, name, description, city, image_url, created_at, updated_at FROM history WHERE 1=1`
+	var args []interface{}
 	argIndex := 1
 	if in.Country != "" {
 		query += fmt.Sprintf(" AND city = $%d", argIndex)
@@ -146,15 +146,23 @@ func (s *HistoryStorage) ListHistorical(in *pb.HistoricalList) (*pb.HistoricalLi
 	}
 	defer rows.Close()
 
+	var total string
 	var historicals []*pb.HistoricalResponse
 	for rows.Next() {
 		var historical pb.HistoricalResponse
-		if err := rows.Scan(&historical.Id, &historical.Name, &historical.Description, &historical.Country, &historical.ImageUrl, &historical.CreatedAt, &historical.UpdatedAt); err != nil {
+		if err := rows.Scan(&total, &historical.Id, &historical.Name, &historical.Description, &historical.Country, &historical.ImageUrl, &historical.CreatedAt, &historical.UpdatedAt); err != nil {
 			return nil, err
 		}
 		historicals = append(historicals, &historical)
 	}
-	return &pb.HistoricalListResponse{Historical: historicals}, nil
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to list historical records: %v", err)
+	}
+
+	return &pb.HistoricalListResponse{
+		Historical: historicals,
+		Total:      total,
+	}, nil
 }
 
 func (s *HistoryStorage) SearchHistorical(in *pb.HistoricalSearch) (*pb.HistoricalListResponse, error) {

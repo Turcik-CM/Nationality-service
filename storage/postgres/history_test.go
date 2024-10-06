@@ -18,8 +18,8 @@ func TestAddHistorical(t *testing.T) {
 	defer db.Close()
 
 	res := pb.Historical{
-		City:        "dodi",
-		Name:        "dodi",
+		City:        "sd",
+		Name:        "dodi1",
 		Description: "dodi",
 		ImageUrl:    "null",
 		CreatedAt:   time.Now().String(),
@@ -86,8 +86,8 @@ func TestListHistorical(t *testing.T) {
 	}
 	defer db.Close()
 	res := pb.HistoricalList{
-		Limit: 1,
-		City:  "dodi",
+		Limit: 2,
+		//Country: "dodi",
 	}
 	his := NewHistoryStorage(db)
 	req, err := his.ListHistorical(&res)

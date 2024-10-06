@@ -245,7 +245,7 @@ func (s *CountriesStorage) DeleteCity(in *pb.GetCityRequest) (*pb.Message, error
 }
 func (s *CountriesStorage) ListCity(in *pb.ListCityRequest) (*pb.ListCityResponse, error) {
 	query := `
-        SELECT id, country_id, name
+        SELECT  COUNT(*) OVER(), id, country_id, name
         FROM cities where 1=1
     `
 	args := []interface{}{}
@@ -280,10 +280,11 @@ func (s *CountriesStorage) ListCity(in *pb.ListCityRequest) (*pb.ListCityRespons
 	}
 	defer rows.Close()
 
+	var total string
 	var countries []*pb.CreateCityResponse
 	for rows.Next() {
 		var country pb.CreateCityResponse
-		if err := rows.Scan(&country.Id, &country.CountryId, &country.Name); err != nil {
+		if err := rows.Scan(&total, &country.Id, &country.CountryId, &country.Name); err != nil {
 			return nil, fmt.Errorf("error scanning country: %v", err)
 		}
 		countries = append(countries, &country)
@@ -293,7 +294,10 @@ func (s *CountriesStorage) ListCity(in *pb.ListCityRequest) (*pb.ListCityRespons
 		return nil, fmt.Errorf("error during row iteration: %v", err)
 	}
 
-	return &pb.ListCityResponse{Countries: countries}, nil
+	return &pb.ListCityResponse{
+		Countries: countries,
+		Total:     total,
+	}, nil
 }
 
 func (s *CountriesStorage) GetBYCount(in *pb.CountryId) (*pb.GetCountryId, error) {

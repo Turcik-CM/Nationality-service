@@ -139,7 +139,7 @@ func (s *AttractionsStorage) DeleteAttraction(in *pb.AttractionId) (*pb.Message,
 
 func (s *AttractionsStorage) ListAttractions(in *pb.AttractionList) (*pb.AttractionListResponse, error) {
 	query := `
-		SELECT id, category, name, description, city, location, image_url, created_at, updated_at
+		SELECT COUNT(*) OVER(), id, category, name, description, city, location, image_url, created_at, updated_at
 		FROM attractions
 		WHERE deleted_at = 0`
 
@@ -183,10 +183,11 @@ func (s *AttractionsStorage) ListAttractions(in *pb.AttractionList) (*pb.Attract
 	}
 	defer rows.Close()
 
+	var total string
 	var attractions []*pb.AttractionResponse
 	for rows.Next() {
 		var attraction pb.AttractionResponse
-		if err := rows.Scan(&attraction.Id, &attraction.Category, &attraction.Name, &attraction.Description, &attraction.City, &attraction.Location, &attraction.ImageUrl, &attraction.CreatedAt, &attraction.UpdatedAt); err != nil {
+		if err := rows.Scan(&total, &attraction.Id, &attraction.Category, &attraction.Name, &attraction.Description, &attraction.City, &attraction.Location, &attraction.ImageUrl, &attraction.CreatedAt, &attraction.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("error scanning attraction: %v", err)
 		}
 		attractions = append(attractions, &attraction)
@@ -196,7 +197,10 @@ func (s *AttractionsStorage) ListAttractions(in *pb.AttractionList) (*pb.Attract
 		return nil, fmt.Errorf("error during row iteration: %v", err)
 	}
 
-	return &pb.AttractionListResponse{Attractions: attractions}, nil
+	return &pb.AttractionListResponse{
+		Attractions: attractions,
+		Total:       total,
+	}, nil
 }
 
 func (s *AttractionsStorage) SearchAttractions(in *pb.AttractionSearch) (*pb.AttractionListResponse, error) {

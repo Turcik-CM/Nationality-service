@@ -131,8 +131,8 @@ func (s *NationalFoodsStorage) DeleteNationalFood(in *pb.NationalFoodId) (*pb.Me
 }
 
 func (s *NationalFoodsStorage) ListNationalFoods(in *pb.NationalFoodList) (*pb.NationalFoodListResponse, error) {
-	query := `SELECT id, food_name, food_type, country_id, description, ingredients, image_url, created_at FROM foods WHERE deleted_at = 0`
-	args := []interface{}{}
+	query := `SELECT COUNT(*) OVER(), id, food_name, food_type, country_id, description, ingredients, image_url, created_at FROM foods WHERE deleted_at = 0`
+	var args []interface{}
 	argIndex := 1
 
 	if in.CountryId != "" {
@@ -159,16 +159,23 @@ func (s *NationalFoodsStorage) ListNationalFoods(in *pb.NationalFoodList) (*pb.N
 	}
 	defer rows.Close()
 
+	var total string
 	var foods []*pb.NationalFoodResponse
 	for rows.Next() {
 		var food pb.NationalFoodResponse
-		if err := rows.Scan(&food.Id, &food.FoodName, &food.FoodType, &food.CountryId, &food.Description, &food.Ingredients, &food.ImageUrl, &food.CreatedAt); err != nil {
+		if err := rows.Scan(&total, &food.Id, &food.FoodName, &food.FoodType, &food.CountryId, &food.Description, &food.Ingredients, &food.ImageUrl, &food.CreatedAt); err != nil {
 			return nil, err
 		}
 		foods = append(foods, &food)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to fetch national foods: %v", err)
+	}
 
-	return &pb.NationalFoodListResponse{NationalFood: foods}, nil
+	return &pb.NationalFoodListResponse{
+		NationalFood: foods,
+		Total:        total,
+	}, nil
 }
 func (s *NationalFoodsStorage) AddImageUrll(in *pb.NationalFoodImage) (*pb.Message, error) {
 	query := `UPDATE foods SET image_url = $1 WHERE id = $2`
