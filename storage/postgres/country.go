@@ -118,7 +118,7 @@ func (s *CountriesStorage) ListCountries(in *pb.ListCountriesRequest) (*pb.ListC
 	argIndex := 1
 
 	if in.Name != "" {
-		query += fmt.Sprintf(" AND name = $%d", argIndex)
+		query += fmt.Sprintf(" AND name ILIKE '%%' || $%d || '%%'", argIndex)
 		args = append(args, in.Name)
 		argIndex++
 	}
@@ -256,7 +256,7 @@ func (s *CountriesStorage) ListCity(in *pb.ListCityRequest) (*pb.ListCityRespons
 	argIndex := 1
 
 	if in.Name != "" {
-		query += fmt.Sprintf(" AND name = $%d", argIndex)
+		query += fmt.Sprintf(" AND name ILIKE '%%' || $%d || '%%'", argIndex)
 		args = append(args, in.Name)
 		argIndex++
 	}

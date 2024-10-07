@@ -147,12 +147,12 @@ func (s *AttractionsStorage) ListAttractions(in *pb.AttractionList) (*pb.Attract
 	argIndex := 1
 
 	if in.City != "" {
-		query += fmt.Sprintf(" AND city = $%d", argIndex)
+		query += fmt.Sprintf(" AND city ILIKE '%%' || $%d || '%%'", argIndex)
 		args = append(args, in.City)
 		argIndex++
 	}
 	if in.Category != "" {
-		query += fmt.Sprintf(" AND category = $%d", argIndex)
+		query += fmt.Sprintf(" AND category ILIKE '%%' || $%d || '%%'", argIndex)
 		args = append(args, in.Category)
 		argIndex++
 	}
@@ -349,7 +349,7 @@ func (s *AttractionsStorage) ListAttractionTypes(in *pb.ListAttractionTypesReque
 	argIndex := 1
 
 	if in.Name != "" {
-		query += fmt.Sprintf(" AND name = $%d", argIndex)
+		query += fmt.Sprintf(" AND name ILIKE '%%' || $%d || '%%'", argIndex)
 		args = append(args, in.Name)
 		argIndex++
 	}

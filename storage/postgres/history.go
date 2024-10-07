@@ -123,7 +123,7 @@ func (s *HistoryStorage) ListHistorical(in *pb.HistoricalList) (*pb.HistoricalLi
 	var args []interface{}
 	argIndex := 1
 	if in.Country != "" {
-		query += fmt.Sprintf(" AND city = $%d", argIndex)
+		query += fmt.Sprintf(" AND city ILIKE '%%' || $%d || '%%'", argIndex)
 		args = append(args, in.Country)
 		argIndex++
 	}
