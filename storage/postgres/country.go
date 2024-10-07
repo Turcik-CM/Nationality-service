@@ -306,11 +306,11 @@ func (s *CountriesStorage) ListCity(in *pb.ListCityRequest) (*pb.ListCityRespons
 
 func (s *CountriesStorage) GetBYCount(in *pb.CountryId) (*pb.GetCountryId, error) {
 	query := `
-        SELECT id, country_id, name
-        FROM cities
-        WHERE country_id = $1
+        SELECT c.id, c.name, cn.name, cn.flag
+        FROM cities AS c LEFT OUTER JOIN countries AS cn ON c.country_id = c.id
+        WHERE c.country_id = $1
     `
-	var countries []*pb.CreateCityResponse
+	var countries []*pb.CreateResponse
 
 	rows, err := s.db.QueryContext(context.Background(), query, in.Id)
 	if err != nil {
@@ -319,8 +319,9 @@ func (s *CountriesStorage) GetBYCount(in *pb.CountryId) (*pb.GetCountryId, error
 	defer rows.Close()
 
 	for rows.Next() {
-		var country pb.CreateCityResponse
-		err := rows.Scan(&country.Id, &country.CountryId, &country.Name)
+		var country pb.CreateResponse
+
+		err := rows.Scan(&country.Id, &country.Id, &country.CityName, &country.CountryName, &country.FlagUrl)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning country row: %v", err)
 		}
