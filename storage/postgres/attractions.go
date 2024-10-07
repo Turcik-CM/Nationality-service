@@ -109,7 +109,7 @@ func (s *AttractionsStorage) UpdateAttraction(in *pb.UpdateAttraction) (*pb.Attr
 	args = append(args, time.Now())
 	argIndex++
 
-	query += fmt.Sprintf(" %s WHERE id = $%d RETURNING id, category, name, description, city, location, image_url, created_at, updated_at",
+	query += fmt.Sprintf(" %s WHERE id = $%d AND deleted_at = 0 RETURNING id, category, name, description, city, location, image_url, created_at, updated_at",
 		strings.Join(updateFields, ", "), argIndex)
 	args = append(args, in.Id)
 
@@ -235,7 +235,7 @@ func (s *AttractionsStorage) SearchAttractions(in *pb.AttractionSearch) (*pb.Att
 
 func (s *AttractionsStorage) AddImageUrl(in *pb.AttractionImage) (*pb.Message, error) {
 	query := `
-		UPDATE attractions SET image_url = $1 WHERE id = $2
+		UPDATE attractions SET image_url = $1 WHERE id = $2 AND deleted_at = 0
 	`
 	_, err := s.db.Exec(query, in.ImageUrl, in.Id)
 	if err != nil {
@@ -249,7 +249,7 @@ func (s *AttractionsStorage) AddImageUrl(in *pb.AttractionImage) (*pb.Message, e
 
 func (s *AttractionsStorage) RemoveHistoricalImage(in *pb.HistoricalImage) (*pb.Message, error) {
 	query := `
-		UPDATE attractions SET image_url = $1 WHERE id = $2
+		UPDATE attractions SET image_url = $1 WHERE id = $2 AND deleted_at = 0
 	`
 	_, err := s.db.Exec(query, "no imag", in.Id)
 	if err != nil {

@@ -94,7 +94,7 @@ func (s *NationalFoodsStorage) UpdateNationalFood(in *pb.UpdateNationalFood) (*p
 		return nil, fmt.Errorf("no fields were updated")
 	}
 
-	query += fmt.Sprintf(" WHERE id = $%d RETURNING id, food_name, food_type, country_id, description, ingredients, image_url, created_at", argIndex)
+	query += fmt.Sprintf(" WHERE id = $%d and deleted_at = 0 RETURNING id, food_name, food_type, country_id, description, ingredients, image_url, created_at", argIndex)
 	args = append(args, in.Id)
 
 	var res pb.NationalFoodResponse
@@ -178,7 +178,7 @@ func (s *NationalFoodsStorage) ListNationalFoods(in *pb.NationalFoodList) (*pb.N
 	}, nil
 }
 func (s *NationalFoodsStorage) AddImageUrll(in *pb.NationalFoodImage) (*pb.Message, error) {
-	query := `UPDATE foods SET image_url = $1 WHERE id = $2`
+	query := `UPDATE foods SET image_url = $1 WHERE id = $2 and deleted_at = 0`
 
 	res, err := s.db.Exec(query, in.ImageUrl, in.Id)
 	if err != nil {
