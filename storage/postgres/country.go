@@ -321,7 +321,7 @@ func (s *CountriesStorage) GetBYCount(in *pb.CountryId) (*pb.GetCountryId, error
 	for rows.Next() {
 		var country pb.CreateResponse
 
-		err := rows.Scan(&country.Id, &country.Id, &country.CityName, &country.CountryName, &country.FlagUrl)
+		err := rows.Scan(&country.Id, &country.CityName, &country.CountryName, &country.FlagUrl)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning country row: %v", err)
 		}
