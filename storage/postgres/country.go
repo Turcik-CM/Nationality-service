@@ -100,10 +100,20 @@ func (s *CountriesStorage) UpdateCountry(in *pb.UpdateCountryRequest) (*pb.Updat
 }
 
 func (s *CountriesStorage) DeleteCountry(in *pb.DeleteCountryRequest) (*pb.Message, error) {
-	query := `DELETE FROM countries WHERE id = $1`
-	_, err := s.db.ExecContext(context.Background(), query, in.Id)
+	p := pb.GetCountryRequest{
+		Id: in.Id,
+	}
+
+	_, err := s.GetCountry(&p)
 	if err != nil {
-		return nil, fmt.Errorf("error deleting country: %v", err)
+		return nil, err
+	}
+
+	query := `DELETE FROM countries WHERE id = $1`
+
+	_, err = s.db.ExecContext(context.Background(), query, in.Id)
+	if err != nil {
+		return nil, err
 	}
 
 	return &pb.Message{Message: "Country deleted successfully"}, nil
@@ -239,9 +249,18 @@ func (s *CountriesStorage) UpdateCity(in *pb.CreateCityResponse) (*pb.CreateCity
 	}, nil
 }
 func (s *CountriesStorage) DeleteCity(in *pb.GetCityRequest) (*pb.Message, error) {
+	p := pb.GetCityRequest{
+		Id: in.Id,
+	}
+
+	_, err := s.GetCity(&p)
+	if err != nil {
+		return nil, fmt.Errorf("error deleting city: %v", err)
+	}
+
 	query := `DELETE FROM cities WHERE id = $1`
 
-	_, err := s.db.Exec(query, in.Id)
+	_, err = s.db.Exec(query, in.Id)
 	if err != nil {
 		return nil, fmt.Errorf("error deleting country: %v", err)
 	}
