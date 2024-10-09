@@ -28,8 +28,8 @@ func TestCreateCountry(t *testing.T) {
 	h := NewCountriesStorage(db)
 
 	res := pb.CreateCountryRequest{
-		Name:     "dodi",
-		ImageUrl: "dodi",
+		Name:     "dodi1",
+		ImageUrl: "dodi1",
 	}
 
 	req, err := h.CreateCountry(&res)
@@ -47,7 +47,7 @@ func TestGetCountry(t *testing.T) {
 	defer db.Close()
 	h := NewCountriesStorage(db)
 	res, err := h.GetCountry(&pb.GetCountryRequest{
-		Id: "8033c910-b040-42cd-a8c2-545171d75303",
+		Id: "e3deb218-0e5a-44e1-8c1b-46617202cb8a",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -132,7 +132,7 @@ func TestGetCity(t *testing.T) {
 	defer db.Close()
 	h := NewCountriesStorage(db)
 	res, err := h.GetCity(&pb.GetCityRequest{
-		Id: "a313d1aa-bf9e-4d28-a942-15f2a4c674cc",
+		Id: "197c0af5-5d5b-408e-88b0-dd5b5f2fe728",
 	})
 	if err != nil {
 		t.Fatal(err)

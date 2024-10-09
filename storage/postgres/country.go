@@ -307,7 +307,8 @@ func (s *CountriesStorage) ListCity(in *pb.ListCityRequest) (*pb.ListCityRespons
 func (s *CountriesStorage) GetBYCount(in *pb.CountryId) (*pb.GetCountryId, error) {
 	query := `
         SELECT c.id, c.name, cn.name, cn.flag
-        FROM cities AS c LEFT OUTER JOIN countries AS cn ON c.country_id = c.id
+        FROM cities AS c 
+        LEFT JOIN countries AS cn ON c.country_id = cn.id
         WHERE c.country_id = $1
     `
 	var countries []*pb.CreateResponse
