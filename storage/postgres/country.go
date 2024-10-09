@@ -240,7 +240,8 @@ func (s *CountriesStorage) UpdateCity(in *pb.CreateCityResponse) (*pb.CreateCity
 }
 func (s *CountriesStorage) DeleteCity(in *pb.GetCityRequest) (*pb.Message, error) {
 	query := `DELETE FROM cities WHERE id = $1`
-	_, err := s.db.ExecContext(context.Background(), query, in.Id)
+
+	_, err := s.db.Exec(query, in.Id)
 	if err != nil {
 		return nil, fmt.Errorf("error deleting country: %v", err)
 	}

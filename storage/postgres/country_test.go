@@ -165,7 +165,7 @@ func TestDeleteCity(t *testing.T) {
 	defer db.Close()
 	h := NewCountriesStorage(db)
 	req, err := h.DeleteCity(&pb.GetCityRequest{
-		Id: "c4647fe8-e5dd-4c1c-960a-6ca72e8e35e0",
+		Id: "a313d1aa-bf9e-4d28-a942-15f2a4c674cc",
 	})
 	if err != nil {
 		t.Fatal(err)
