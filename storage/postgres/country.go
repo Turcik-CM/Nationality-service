@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	pb "nationality-service/genproto/nationality"
+	"strconv"
 	"strings"
 )
 
@@ -267,21 +268,24 @@ func (s *CountriesStorage) DeleteCity(in *pb.GetCityRequest) (*pb.Message, error
 
 	return &pb.Message{Message: "Country deleted successfully"}, nil
 }
-func (s *CountriesStorage) ListCity(in *pb.ListCityRequest) (*pb.ListCityResponse, error) {
+func (s *CountriesStorage) ListCity(in *pb.ListCityRequest) (*pb.GetListCountry, error) {
 	query := `
-        SELECT  COUNT(*) OVER(), id, country_id, name
-        FROM cities where 1=1
+        SELECT COUNT(*) OVER(), c.id, c.name, cn.name, cn.flag
+        FROM cities AS c 
+        LEFT JOIN countries AS cn ON c.country_id = cn.id
+        WHERE 1=1  
     `
+
 	args := []interface{}{}
 	argIndex := 1
 
 	if in.Name != "" {
-		query += fmt.Sprintf(" AND name ILIKE '%%' || $%d || '%%'", argIndex)
+		query += fmt.Sprintf(" AND c.name ILIKE '%%' || $%d || '%%'", argIndex)
 		args = append(args, in.Name)
 		argIndex++
 	}
 	if in.CountryId != "" {
-		query += fmt.Sprintf(" AND country_id = $%d", argIndex)
+		query += fmt.Sprintf(" AND c.country_id = $%d", argIndex)
 		args = append(args, in.CountryId)
 		argIndex++
 	}
@@ -305,10 +309,10 @@ func (s *CountriesStorage) ListCity(in *pb.ListCityRequest) (*pb.ListCityRespons
 	defer rows.Close()
 
 	var total string
-	var countries []*pb.CreateCityResponse
+	var countries []*pb.CreateResponse
 	for rows.Next() {
-		var country pb.CreateCityResponse
-		if err := rows.Scan(&total, &country.Id, &country.CountryId, &country.Name); err != nil {
+		var country pb.CreateResponse
+		if err := rows.Scan(&total, &country.Id, &country.CityName, &country.CountryName, &country.FlagUrl); err != nil {
 			return nil, fmt.Errorf("error scanning country: %v", err)
 		}
 		countries = append(countries, &country)
@@ -318,13 +322,24 @@ func (s *CountriesStorage) ListCity(in *pb.ListCityRequest) (*pb.ListCityRespons
 		return nil, fmt.Errorf("error during row iteration: %v", err)
 	}
 
-	return &pb.ListCityResponse{
+	var tt int
+
+	if total != "" {
+
+		tt, err = strconv.Atoi(total)
+		if err != nil {
+			return nil, fmt.Errorf("error converting countries to int: %v", err)
+		}
+
+	}
+
+	return &pb.GetListCountry{
 		Countries: countries,
-		Total:     total,
+		Total:     int32(tt),
 	}, nil
 }
 
-func (s *CountriesStorage) GetBYCount(in *pb.CountryId) (*pb.GetCountryId, error) {
+func (s *CountriesStorage) GetBYCount(in *pb.CountryId) (*pb.GetListCountry, error) {
 	query := `
         SELECT c.id, c.name, cn.name, cn.flag
         FROM cities AS c 
@@ -353,7 +368,7 @@ func (s *CountriesStorage) GetBYCount(in *pb.CountryId) (*pb.GetCountryId, error
 		return nil, fmt.Errorf("error iterating over country rows: %v", err)
 	}
 
-	return &pb.GetCountryId{
+	return &pb.GetListCountry{
 		Countries: countries,
 	}, nil
 }

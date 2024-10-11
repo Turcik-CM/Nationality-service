@@ -54,6 +54,6 @@ type CountriesStorage interface {
 	GetCity(in *pb.GetCityRequest) (*pb.CreateCityResponse, error)
 	UpdateCity(in *pb.CreateCityResponse) (*pb.CreateCityResponse, error)
 	DeleteCity(in *pb.GetCityRequest) (*pb.Message, error)
-	ListCity(in *pb.ListCityRequest) (*pb.ListCityResponse, error)
-	GetBYCount(in *pb.CountryId) (*pb.GetCountryId, error)
+	ListCity(in *pb.ListCityRequest) (*pb.GetListCountry, error)
+	GetBYCount(in *pb.CountryId) (*pb.GetListCountry, error)
 }
