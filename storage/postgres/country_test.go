@@ -28,8 +28,8 @@ func TestCreateCountry(t *testing.T) {
 	h := NewCountriesStorage(db)
 
 	res := pb.CreateCountryRequest{
-		Name:     "dodi1",
-		ImageUrl: "dodi1",
+		Name:     "dodi111",
+		ImageUrl: "dodi111",
 	}
 
 	req, err := h.CreateCountry(&res)
@@ -47,7 +47,7 @@ func TestGetCountry(t *testing.T) {
 	defer db.Close()
 	h := NewCountriesStorage(db)
 	res, err := h.GetCountry(&pb.GetCountryRequest{
-		Id: "e3deb218-0e5a-44e1-8c1b-46617202cb8a",
+		Id: "403967ee-6b97-4e1e-804d-c1d6ef99cd07",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -80,7 +80,7 @@ func TestDeleteCountry(t *testing.T) {
 	defer db.Close()
 	h := NewCountriesStorage(db)
 	res, err := h.DeleteCountry(&pb.DeleteCountryRequest{
-		Id: "81bb127c-e323-453a-beb9-1e2bab7ac3b5",
+		Id: "403967ee-6b97-4e1e-804d-c1d6ef99cd07",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -115,8 +115,8 @@ func TestCreateCity(t *testing.T) {
 	defer db.Close()
 	h := NewCountriesStorage(db)
 	res, err := h.CreateCity(&pb.CreateCityRequest{
-		CountryId: "8033c910-b040-42cd-a8c2-545171d75303",
-		Name:      "sd",
+		CountryId: "5b74b327-619a-485b-b6d2-0ae1b6ca02a4",
+		Name:      "sd111111",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -132,7 +132,7 @@ func TestGetCity(t *testing.T) {
 	defer db.Close()
 	h := NewCountriesStorage(db)
 	res, err := h.GetCity(&pb.GetCityRequest{
-		Id: "197c0af5-5d5b-408e-88b0-dd5b5f2fe728",
+		Id: "84179f27-ec53-462d-97b0-a5aaef8c503b",
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -165,7 +165,7 @@ func TestDeleteCity(t *testing.T) {
 	defer db.Close()
 	h := NewCountriesStorage(db)
 	req, err := h.DeleteCity(&pb.GetCityRequest{
-		Id: "c4647fe8-e5dd-4c1c-960a-6ca72e8e35e0",
+		Id: "537507a1-6557-4a52-97b6-d3fe0cf9293b",
 	})
 	if err != nil {
 		t.Fatal(err)
