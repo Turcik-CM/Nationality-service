@@ -87,7 +87,7 @@ func (s *TourismService) DeleteCity(ctx context.Context, in *pb.GetCityRequest) 
 	return resp, nil
 }
 
-func (s *TourismService) ListCity(ctx context.Context, in *pb.ListCityRequest) (*pb.ListCityResponse, error) {
+func (s *TourismService) ListCity(ctx context.Context, in *pb.ListCityRequest) (*pb.GetListCountry, error) {
 	resp, err := s.country.ListCity(in)
 	if err != nil {
 		s.logger.Error("Error in ListCity: ", err)
@@ -96,7 +96,7 @@ func (s *TourismService) ListCity(ctx context.Context, in *pb.ListCityRequest) (
 	return resp, nil
 }
 
-func (s *TourismService) GetBYCount(ctx context.Context, in *pb.CountryId) (*pb.GetCountryId, error) {
+func (s *TourismService) GetBYCount(ctx context.Context, in *pb.CountryId) (*pb.GetListCountry, error) {
 	resp, err := s.country.GetBYCount(in)
 	if err != nil {
 		s.logger.Error("Error in GetBYCount: ", err)
