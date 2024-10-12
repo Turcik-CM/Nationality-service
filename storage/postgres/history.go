@@ -119,12 +119,12 @@ func (s *HistoryStorage) DeleteHistorical(in *pb.HistoricalId) (*pb.Message, err
 }
 
 func (s *HistoryStorage) ListHistorical(in *pb.HistoricalList) (*pb.HistoricalListResponse, error) {
-	query := `SELECT COUNT(*) OVER(), id, name, description, city, image_url, created_at, updated_at FROM history WHERE deleted_at = 0`
+	query := `SELECT COUNT(*) OVER(), id, name, description, city, image_url, created_at, updated_at FROM history WHERE deleted_at = 0 `
 	var args []interface{}
 	argIndex := 1
-	if in.Country != "" {
+	if in.City != "" {
 		query += fmt.Sprintf(" AND city ILIKE '%%' || $%d || '%%'", argIndex)
-		args = append(args, in.Country)
+		args = append(args, in.City)
 		argIndex++
 	}
 
