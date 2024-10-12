@@ -87,7 +87,7 @@ func (s *HistoryStorage) UpdateHistoricals(in *pb.UpdateHistorical) (*pb.Histori
 
 	var res pb.HistoricalResponse
 	err := s.db.QueryRowContext(context.Background(), query, args...).Scan(
-		&res.Id, &res.Name, &res.Description, &res.Country, &res.ImageUrl, &res.CreatedAt, &res.UpdatedAt)
+		&res.Id, &res.Name, &res.Description, &res.City, &res.ImageUrl, &res.CreatedAt, &res.UpdatedAt)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to update historical record: %v", err)
@@ -97,7 +97,7 @@ func (s *HistoryStorage) UpdateHistoricals(in *pb.UpdateHistorical) (*pb.Histori
 }
 
 func (s *HistoryStorage) GetHistoricalByID(in *pb.HistoricalId) (*pb.HistoricalResponse, error) {
-	query := `SELECT id, name, description, city, image_url, created_at, updated_at FROM history WHERE id = $1`
+	query := `SELECT id, name, description, city, image_url, created_at, updated_at FROM history WHERE deleted_at = 0 and id = $1`
 
 	var historical pb.HistoricalResponse
 	if err := s.db.QueryRow(query, in.Id).Scan(&historical.Id, &historical.Name, &historical.Description, &historical.City, &historical.ImageUrl, &historical.CreatedAt, &historical.UpdatedAt); err != nil {
@@ -119,7 +119,7 @@ func (s *HistoryStorage) DeleteHistorical(in *pb.HistoricalId) (*pb.Message, err
 }
 
 func (s *HistoryStorage) ListHistorical(in *pb.HistoricalList) (*pb.HistoricalListResponse, error) {
-	query := `SELECT COUNT(*) OVER(), id, name, description, city, image_url, created_at, updated_at FROM history WHERE 1=1`
+	query := `SELECT COUNT(*) OVER(), id, name, description, city, image_url, created_at, updated_at FROM history WHERE deleted_at = 0`
 	var args []interface{}
 	argIndex := 1
 	if in.Country != "" {
@@ -150,7 +150,7 @@ func (s *HistoryStorage) ListHistorical(in *pb.HistoricalList) (*pb.HistoricalLi
 	var historicals []*pb.HistoricalResponse
 	for rows.Next() {
 		var historical pb.HistoricalResponse
-		if err := rows.Scan(&total, &historical.Id, &historical.Name, &historical.Description, &historical.Country, &historical.ImageUrl, &historical.CreatedAt, &historical.UpdatedAt); err != nil {
+		if err := rows.Scan(&total, &historical.Id, &historical.Name, &historical.Description, &historical.City, &historical.ImageUrl, &historical.CreatedAt, &historical.UpdatedAt); err != nil {
 			return nil, err
 		}
 		historicals = append(historicals, &historical)
@@ -166,7 +166,7 @@ func (s *HistoryStorage) ListHistorical(in *pb.HistoricalList) (*pb.HistoricalLi
 }
 
 func (s *HistoryStorage) SearchHistorical(in *pb.HistoricalSearch) (*pb.HistoricalListResponse, error) {
-	query := `SELECT id, name, description, city, image_url, created_at FROM history WHERE name ILIKE '%' || $1 || '%' or description ILIKE '%' || $1 || '%'`
+	query := `SELECT id, name, description, city, image_url, created_at FROM history WHERE deleted_at = 0 and (name ILIKE '%' || $1 || '%' or description ILIKE '%' || $1 || '%')`
 	args := []interface{}{in.Search}
 
 	rows, err := s.db.Query(query, args...)
