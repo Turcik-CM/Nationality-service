@@ -50,7 +50,6 @@ CREATE TABLE IF NOT EXISTS foods
 (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     food_name   VARCHAR(255) NOT NULL UNIQUE,
-    food_type   VARCHAR(100),
     country_id  UUID REFERENCES countries (id) ON DELETE CASCADE,
     description TEXT,
     ingredients TEXT,

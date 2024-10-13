@@ -31,16 +31,15 @@ func (s *NationalFoodsStorage) CreateNationalFood(in *pb.NationalFood) (*pb.Nati
 	}
 
 	query := `
-		INSERT INTO foods (id, food_name, food_type, country_id, description, ingredients, image_url, created_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`
+		INSERT INTO foods (id, food_name, country_id, description, ingredients, image_url, created_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`
 
-	if err := s.db.QueryRow(query, id, in.FoodName, in.FoodType, in.CountryId, in.Description, in.Ingredients, in.ImageUrl, createdAt).Scan(&id); err != nil {
+	if err := s.db.QueryRow(query, id, in.FoodName, in.CountryId, in.Description, in.Ingredients, in.ImageUrl, createdAt).Scan(&id); err != nil {
 		return nil, err
 	}
 
 	return &pb.NationalFoodResponse{
 		Id:          id.String(),
-		FoodType:    in.FoodType,
 		FoodName:    in.FoodName,
 		Description: in.Description,
 		CountryId:   in.CountryId,
@@ -60,11 +59,7 @@ func (s *NationalFoodsStorage) UpdateNationalFood(in *pb.UpdateNationalFood) (*p
 		args = append(args, in.FoodName)
 		argIndex++
 	}
-	if in.FoodType != "" {
-		updateFields = append(updateFields, fmt.Sprintf("food_type = $%d", argIndex))
-		args = append(args, in.FoodType)
-		argIndex++
-	}
+
 	if in.CountryId != "" {
 		updateFields = append(updateFields, fmt.Sprintf("country_id = $%d", argIndex))
 		args = append(args, in.CountryId)
@@ -94,12 +89,12 @@ func (s *NationalFoodsStorage) UpdateNationalFood(in *pb.UpdateNationalFood) (*p
 		return nil, fmt.Errorf("no fields were updated")
 	}
 
-	query += fmt.Sprintf(" WHERE id = $%d and deleted_at = 0 RETURNING id, food_name, food_type, country_id, description, ingredients, image_url, created_at", argIndex)
+	query += fmt.Sprintf(" WHERE id = $%d and deleted_at = 0 RETURNING id, food_name, country_id, description, ingredients, image_url, created_at", argIndex)
 	args = append(args, in.Id)
 
 	var res pb.NationalFoodResponse
 	err := s.db.QueryRowContext(context.Background(), query, args...).Scan(
-		&res.Id, &res.FoodName, &res.FoodType, &res.CountryId, &res.Description, &res.Ingredients, &res.ImageUrl, &res.CreatedAt)
+		&res.Id, &res.FoodName, &res.CountryId, &res.Description, &res.Ingredients, &res.ImageUrl, &res.CreatedAt)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to update national food: %v", err)
@@ -109,10 +104,10 @@ func (s *NationalFoodsStorage) UpdateNationalFood(in *pb.UpdateNationalFood) (*p
 }
 
 func (s *NationalFoodsStorage) GetNationalFoodByID(in *pb.NationalFoodId) (*pb.NationalFoodResponse, error) {
-	query := `SELECT id, food_name, food_type, country_id, description, ingredients, image_url, created_at FROM foods WHERE id = $1 and deleted_at = 0`
+	query := `SELECT id, food_name, country_id, description, ingredients, image_url, created_at FROM foods WHERE id = $1 and deleted_at = 0`
 
 	var food pb.NationalFoodResponse
-	if err := s.db.QueryRow(query, in.Id).Scan(&food.Id, &food.FoodName, &food.FoodType, &food.CountryId, &food.Description, &food.Ingredients, &food.ImageUrl, &food.CreatedAt); err != nil {
+	if err := s.db.QueryRow(query, in.Id).Scan(&food.Id, &food.FoodName, &food.CountryId, &food.Description, &food.Ingredients, &food.ImageUrl, &food.CreatedAt); err != nil {
 		return nil, err
 	}
 
@@ -131,7 +126,7 @@ func (s *NationalFoodsStorage) DeleteNationalFood(in *pb.NationalFoodId) (*pb.Me
 }
 
 func (s *NationalFoodsStorage) ListNationalFoods(in *pb.NationalFoodList) (*pb.NationalFoodListResponse, error) {
-	query := `SELECT COUNT(*) OVER(), id, food_name, food_type, country_id, description, ingredients, image_url, created_at FROM foods WHERE deleted_at = 0`
+	query := `SELECT COUNT(*) OVER(), id, food_name, country_id, description, ingredients, image_url, created_at FROM foods WHERE deleted_at = 0`
 	var args []interface{}
 	argIndex := 1
 
@@ -163,7 +158,7 @@ func (s *NationalFoodsStorage) ListNationalFoods(in *pb.NationalFoodList) (*pb.N
 	var foods []*pb.NationalFoodResponse
 	for rows.Next() {
 		var food pb.NationalFoodResponse
-		if err := rows.Scan(&total, &food.Id, &food.FoodName, &food.FoodType, &food.CountryId, &food.Description, &food.Ingredients, &food.ImageUrl, &food.CreatedAt); err != nil {
+		if err := rows.Scan(&total, &food.Id, &food.FoodName, &food.CountryId, &food.Description, &food.Ingredients, &food.ImageUrl, &food.CreatedAt); err != nil {
 			return nil, err
 		}
 		foods = append(foods, &food)
