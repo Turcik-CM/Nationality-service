@@ -18,7 +18,6 @@ func TestCreateNationalFood(t *testing.T) {
 	defer db.Close()
 	res := pb.NationalFood{
 		FoodName:    "dodi12",
-		FoodType:    "dodi2",
 		Description: "dodi12",
 		CountryId:   "2140e218-b8fd-4ff0-a5c7-bd18dccffc08",
 		ImageUrl:    "null",
