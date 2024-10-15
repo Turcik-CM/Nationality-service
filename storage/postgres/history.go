@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -126,6 +127,7 @@ func (s *HistoryStorage) ListHistorical(in *pb.HistoricalList) (*pb.HistoricalLi
 		query += fmt.Sprintf(" AND city ILIKE '%%' || $%d || '%%'", argIndex)
 		args = append(args, in.City)
 		argIndex++
+		log.Println(in.City)
 	}
 
 	if in.Limit > 0 {
