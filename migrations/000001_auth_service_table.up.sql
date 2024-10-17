@@ -49,12 +49,13 @@ CREATE TABLE IF NOT EXISTS attractions
 CREATE TABLE IF NOT EXISTS foods
 (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    food_name   VARCHAR(255) NOT NULL UNIQUE,
+    food_name   VARCHAR(255) NOT NULL,
     country_id  UUID REFERENCES countries (id) ON DELETE CASCADE,
     description TEXT,
     ingredients TEXT,
     image_url   VARCHAR(255),
     created_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
-    deleted_at  BIGINT           DEFAULT 0
+    deleted_at  BIGINT           DEFAULT 0,
+    UNIQUE(deleted_at, food_name)
 );
